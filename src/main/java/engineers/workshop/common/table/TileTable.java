@@ -383,6 +383,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 				List<EntityPlayer> updatePlayers = world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb);
 				updatePlayers.removeAll(players);
 			}
+			updateFuel();
 		}
 	}
 
