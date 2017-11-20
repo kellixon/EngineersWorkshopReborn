@@ -37,7 +37,7 @@ public class ItemUpgrade extends Item {
 	}
 
 	public static Upgrade getUpgrade(ItemStack item) {
-        return !item.isEmpty() && ItemLoader.itemUpgrade.equals(item.getItem()) ? getUpgrade(item.getItemDamage()) : null;
+		return !item.isEmpty() && ItemLoader.itemUpgrade.equals(item.getItem()) ? getUpgrade(item.getItemDamage()) : null;
 	}
 
 	@Override

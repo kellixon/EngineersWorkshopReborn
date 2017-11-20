@@ -38,13 +38,13 @@ public class SlotUpgrade extends SlotTable {
 
 	@Override
 	public boolean isItemValid(ItemStack itemstack) {
-		return super.isItemValid(itemstack) && (itemstack == null || (isMain ? isMainItem(itemstack) : isUpgradeItem(itemstack)));
+		System.out.println(isMainItem(itemstack) + ":" + isUpgradeItem(itemstack) + ";" + isMain);
+		return super.isItemValid(itemstack) && (itemstack.isEmpty() || (isMain ? isMainItem(itemstack) : isUpgradeItem(itemstack)));
 	}
 
 	private boolean isUpgradeItem(ItemStack itemstack) {
 		Upgrade upgrade = ItemUpgrade.getUpgrade(itemstack);
-
-		return upgrade != null && upgrade.isValid(main != null ? main.getStack() : null) && (upgrade.getDependency() == null || table.getUpgradePage().getUpgradeCount(upgradeSection, upgrade.getDependency()) > 0);
+		return upgrade != null && upgrade.isValid(main != null ? main.getStack() : ItemStack.EMPTY) && (upgrade.getDependency() == null || table.getUpgradePage().getUpgradeCount(upgradeSection, upgrade.getDependency()) > 0);
 	}
 
 	private boolean isMainItem(ItemStack stack) {

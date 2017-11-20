@@ -9,7 +9,7 @@ public class ItemSetting {
 
     private int id;
 	@Nonnull
-    private ItemStack item;
+    private ItemStack item = ItemStack.EMPTY;
     private TransferMode mode = TransferMode.PRECISE;
 
     public ItemSetting(int id) {

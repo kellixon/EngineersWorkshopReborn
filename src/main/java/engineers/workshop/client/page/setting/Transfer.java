@@ -119,7 +119,7 @@ public class Transfer {
 
     public void readFromNBT(NBTTagCompound compound) {
         for (ItemSetting item : items) {
-            item.setItem(null);
+            item.setItem(ItemStack.EMPTY);
             item.setMode(TransferMode.PRECISE);
         }
 

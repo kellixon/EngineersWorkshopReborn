@@ -3,6 +3,9 @@ package engineers.workshop.common.network;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 
 public class DataReader {
 
@@ -34,8 +37,14 @@ public class DataReader {
                 data |= byteBuffer << readBits;
                 readBits += bitCountBuffer;
 
-                byteBuffer = stream.readUnsignedByte();
-                bitCountBuffer = 8;
+	            byte[] bytes = new byte[stream.capacity()];
+	            stream.getBytes(0, bytes);
+	            try {
+		            byteBuffer = new DataInputStream(new ByteArrayInputStream(bytes)).readUnsignedByte();
+	            } catch (IOException e) {
+		            throw new RuntimeException(e);
+	            }
+	            bitCountBuffer = 8;
             }
         }
 

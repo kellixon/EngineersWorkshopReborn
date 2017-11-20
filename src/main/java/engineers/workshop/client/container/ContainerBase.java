@@ -55,7 +55,7 @@ public abstract class ContainerBase extends Container {
     @Override
     public NonNullList<ItemStack> getInventory() {
 
-	    NonNullList<ItemStack> result = NonNullList.withSize(getSlots().size(), ItemStack.EMPTY);
+	    NonNullList<ItemStack> result = NonNullList.create();
 	    getSlots().forEach(slot -> result.add(slot.getStack()));
         return result;
     }

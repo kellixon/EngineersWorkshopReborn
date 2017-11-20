@@ -380,6 +380,9 @@ public class UnitCraft extends Unit {
 				return false;
 
 			for (int i = 0; i < getFullSize(); i++) {
+				if(getStackInSlot(i) == null){ //Not sure whats cuasing it, but this is a dirty work around
+					return false;
+				}
 				if (!ItemStack.areItemStacksEqual(getStackInSlot(i), crafting.getStackInSlot(i))) {
 					return false;
 				}

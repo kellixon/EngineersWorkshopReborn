@@ -129,7 +129,7 @@ public abstract class Unit {
 	private boolean isCharging() {
 		if (canCharge()) {
 			ItemStack result = getProductionResult();
-			if (result == null) {
+			if (result.isEmpty()) {
 				return true;
 			} else {
 				ItemStack output = table.getStackInSlot(getOutputId());
@@ -153,7 +153,7 @@ public abstract class Unit {
 	}
 
 	private void produce(ItemStack result, ItemStack output) {
-		if (output == null) {
+		if (output.isEmpty()) {
 			table.setInventorySlotContents(getOutputId(), result.copy());
 		} else {
 			table.getStackInSlot(getOutputId()).grow(result.getCount());
@@ -168,7 +168,7 @@ public abstract class Unit {
 			boolean updatedProgress = false;
 			boolean canReset = false;
 			ItemStack result = getProductionResult();
-			if (result != null) {
+			if (!result.isEmpty()) {
 				boolean updatedCharge = false;
 				boolean done;
 				do {
@@ -258,8 +258,8 @@ public abstract class Unit {
 	protected abstract void onProduction(ItemStack result);
 
 	protected boolean canMove(ItemStack source, ItemStack target) {
-		if (source != null) {
-			if (target == null) {
+		if (!source.isEmpty()) {
+			if (target.isEmpty()) {
 				return true;
 			} else if (target.isItemEqual(source) && ItemStack.areItemStackTagsEqual(target, source)) {
 				int resultSize = target.getCount() + source.getCount();
