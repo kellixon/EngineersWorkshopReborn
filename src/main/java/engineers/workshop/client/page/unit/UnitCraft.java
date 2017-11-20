@@ -23,6 +23,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+
 public class UnitCraft extends Unit {
 
 	public UnitCraft(TileTable table, Page page, int id, int x, int y) {
@@ -78,7 +80,7 @@ public class UnitCraft extends Unit {
 	@Override
 	public boolean isEnabled() {
 		ItemStack item = table.getUpgradePage().getUpgradeMainItem(id);
-		return item != null && Upgrade.ParentType.CRAFTING.isValidParent(item);
+		return !item.isEmpty() && Upgrade.ParentType.CRAFTING.isValidParent(item);
 	}
 
 	@Override
@@ -99,7 +101,7 @@ public class UnitCraft extends Unit {
 
 	private void onCrafted(EntityPlayer player, ItemStack itemStack) {
 
-		if (itemStack == null) {
+		if (itemStack.isEmpty()) {
 			return;
 		}
 
@@ -125,7 +127,7 @@ public class UnitCraft extends Unit {
 
 		boolean isEmpty = true;
 		for (int i = gridId; i < gridId + GRID_SIZE; i++) {
-			if (table.getStackInSlot(i) != null) {
+			if (!table.getStackInSlot(i).isEmpty()) {
 				isEmpty = false;
 				break;
 			}
@@ -208,7 +210,7 @@ public class UnitCraft extends Unit {
 		if (!lockedRecipeGeneration) {
 			IRecipe recipe = inventoryCrafting.getRecipe();
 			ItemStack result = inventoryCrafting.getResult(recipe);
-			if (result != null) {
+			if (!result.isEmpty()) {
 				result = result.copy();
 			}
 			table.setInventorySlotContents(resultId, result);
@@ -275,7 +277,7 @@ public class UnitCraft extends Unit {
 			items = new ItemStack[base.getFullSize()];
 			for (int i = 0; i < items.length; i++) {
 				ItemStack itemStack = base.getStackInSlot(i);
-				if (itemStack != null) {
+				if (!itemStack.isEmpty()) {
 					items[i] = itemStack.copy();
 				}
 			}
@@ -330,7 +332,7 @@ public class UnitCraft extends Unit {
 				}
 				return result;
 			} else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
 
@@ -340,12 +342,13 @@ public class UnitCraft extends Unit {
 				int id = x + y * INVENTORY_WIDTH;
 				return this.getStackInSlot(id);
 			} else {
-				return null;
+				return ItemStack.EMPTY;
 			}
 		}
 
+		@Nonnull
 		public ItemStack getResult(IRecipe recipe) {
-			return recipe == null ? null : recipe.getCraftingResult(this);
+			return recipe == null ? ItemStack.EMPTY : recipe.getCraftingResult(this);
 		}
 
 		public boolean isMatch(IRecipe recipe) {
@@ -467,7 +470,7 @@ public class UnitCraft extends Unit {
 				return result;
 			}
 		}
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override

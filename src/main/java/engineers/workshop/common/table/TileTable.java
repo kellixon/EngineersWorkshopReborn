@@ -47,6 +47,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -61,7 +62,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	private List<Page> pages;
 	private Page selectedPage;
 	private List<SlotBase> slots;
-	private ItemStack[] items;
+	private NonNullList<ItemStack> items;
 
 	private GuiMenu menu;
 
@@ -94,7 +95,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		for (Page page : pages) {
 			id = page.createSlots(id);
 		}
-		items = new ItemStack[slots.size()];
+		items = NonNullList.withSize(slots.size(), ItemStack.EMPTY);
 		setSelectedPage(pages.get(0));
 		onUpgradeChange();
 	}
@@ -115,13 +116,13 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		this.selectedPage = selectedPage;
 	}
 
-	public ItemStack[] getItems() {
+	public NonNullList<ItemStack> getItems() {
 		return items;
 	}
 
 	@Override
 	public int getSizeInventory() {
-		return items.length;
+		return items.size();
 	}
 
 	@Override
@@ -149,7 +150,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	@Override
 	@Nonnull
 	public ItemStack getStackInSlot(int id) {
-		return items[id];
+		return items.get(id);
 	}
 
 	@Override
@@ -174,13 +175,13 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			setInventorySlotContents(id, ItemStack.EMPTY);
 			return item;
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
-	public void setInventorySlotContents(int id, ItemStack item) {
-		items[id] = item;
+	public void setInventorySlotContents(int id, @Nonnull ItemStack item) {
+		items.set(id, item);
 	}
 
 	@Override
@@ -691,9 +692,9 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		compound.setInteger(NBT_MAX_POWER, maxPower);
 
 		NBTTagList itemList = new NBTTagList();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] != null) {
-				NBTTagCompound slotTag = items[i].writeToNBT(new NBTTagCompound());
+		for (int i = 0; i < items.size(); i++) {
+			if (!items.get(i).isEmpty()) {
+				NBTTagCompound slotTag = items.get(i).writeToNBT(new NBTTagCompound());
 				slotTag.setInteger(NBT_SLOT, i);
 				itemList.appendTag(slotTag);
 			}
@@ -737,7 +738,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		power = compound.getInteger(NBT_POWER);
 		maxPower = compound.getInteger(NBT_MAX_POWER);
 
-		items = new ItemStack[getSizeInventory()];
+		items = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
 
 		NBTTagList itemList = compound.getTagList(NBT_ITEMS, COMPOUND_ID);
 		for (int i = 0; i < itemList.tagCount(); i++) {
@@ -746,8 +747,8 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			if (id < 0) {
 				id += 256;
 			}
-			if (id >= 0 && id < items.length) {
-				items[id] = new ItemStack(slotCompound);
+			if (id >= 0 && id < items.size()) {
+				items.set(id, new ItemStack(slotCompound));
 			}
 		}
 

@@ -19,7 +19,7 @@ public class RecipeLoader {
         addRecipe(Upgrade.AUTO_CRAFTER, "PPP", "CTC", "CUC", 'P', PLANKS, 'C', COBBLESTONE, 'T', PISTON, 'U', Upgrade.BLANK.getItemStack());
         addRecipe(Upgrade.SPEED, "IRI", "LUL", "IRI", 'I', IRON_INGOT, 'R', REDSTONE, 'L', new ItemStack(DYE, 1, 4), 'U', Upgrade.BLANK.getItemStack());
         addRecipe(Upgrade.QUEUE, "PPP", "IUI", "PPP", 'I', IRON_INGOT, 'P', PLANKS, 'U', Upgrade.BLANK.getItemStack());
-        addRecipe(Upgrade.SOLAR, "CCC", "GGG", "UDU", 'I', IRON_INGOT, 'G', DAYLIGHT_DETECTOR, 'C', GLASS, 'U', DIAMOND,'D', Upgrade.BLANK.getItemStack());
+        addRecipe(Upgrade.SOLAR, "CCC", "GGG", "UDU", 'G', DAYLIGHT_DETECTOR, 'C', GLASS, 'U', DIAMOND,'D', Upgrade.BLANK.getItemStack());
         addRecipe(Upgrade.EFFICIENCY, "III", "FPF", "RUR", 'I', IRON_INGOT, 'R', REDSTONE, 'F', FURNACE, 'P', PISTON, 'U', Upgrade.BLANK.getItemStack());
         addRecipe(Upgrade.AUTO_TRANSFER, "GGG", "HUH", "GGG", 'G', GOLD_INGOT, 'H', HOPPER, 'U', Upgrade.BLANK.getItemStack());
         addRecipe(Upgrade.FILTER, "III", "GBG", "IUI", 'G', Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE, 'I', IRON_INGOT, 'B', Blocks.IRON_BARS, 'U', Upgrade.BLANK.getItemStack());
