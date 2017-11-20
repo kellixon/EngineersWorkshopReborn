@@ -27,6 +27,7 @@ public abstract class GuiBase extends GuiContainer {
 
 	@Override
 	public void drawScreen(int x, int y, float f) {
+		this.drawDefaultBackground();
 		selectedSlot = null;
 		shiftMoveRendered = false;
 		for (Object obj : inventorySlots.inventorySlots) {
@@ -39,6 +40,7 @@ public abstract class GuiBase extends GuiContainer {
 		clearMouseOverCache();
 
 		super.drawScreen(x, y, f);
+		this.renderHoveredToolTip(x, y);
 	}
 
 	public SlotBase getSelectedSlot() {

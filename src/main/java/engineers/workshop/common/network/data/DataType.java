@@ -9,7 +9,6 @@ import engineers.workshop.common.table.TileTable;
 public enum DataType {
     PAGE(DataPage.class),
     PROGRESS(DataUnit.Progress.class, DataUnit.LENGTH),
-    POWER(DataFuel.class),
     SIDE_ENABLED(DataSide.Enabled.class, DataSide.LENGTH),
     SIDE_AUTO(DataSide.Auto.class, DataSide.LENGTH),
     SIDE_FILTER(DataSide.Filter.class, DataSide.FilterBase.LENGTH),

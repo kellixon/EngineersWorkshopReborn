@@ -44,8 +44,8 @@ public class WailaWorkshop implements IWailaDataProvider {
 	@Override
 	public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
 		TileTable table = (TileTable) te;
-		tag.setInteger("power", table.getStoredPower());
-		tag.setInteger("maxPower", table.getCapacity());
+		tag.setInteger("power", table.getPower());
+		tag.setInteger("maxPower", table.maxPower);
 
 		return tag;
 	}

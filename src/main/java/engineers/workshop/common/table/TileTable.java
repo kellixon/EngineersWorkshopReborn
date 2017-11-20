@@ -37,7 +37,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -52,7 +51,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class TileTable extends TileEntity implements IInventory, ISidedInventory, ITickable, /* RF */ IEnergyReceiver {
+public class TileTable extends TileEntity implements IInventory, ISidedInventory, ITickable  {
 
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
@@ -67,7 +66,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	private GuiMenu menu;
 
 	private int power;
-	public int maxPower = ConfigLoader.TWEAKS.MIN_POWER;
+	public int maxPower = 8000;
 	private SlotFuel fuelSlot;
 
 	public int getPower() {
@@ -324,8 +323,6 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		case UPGRADE_CHANGE:
 			onUpgradeChange();
 			break;
-		case RENDER_UPDATE:
-			DataType.POWER.load(this, dr, true);
 		default:
 			break;
 		}
@@ -338,7 +335,6 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	private boolean lastLit;
 	private int slotTick = 0;
 	private static final int SLOT_DELAY = 10;
-	private int fuelDelay;
 	private boolean firstUpdate = true;
 
 	private int tickCount = 0;
@@ -355,11 +351,6 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			firstUpdate = false;
 		}
 
-		if (!world.isRemote && ++fuelTick >= fuelDelay) {
-			lit = world.canSeeSky(pos.up());
-			fuelTick = 0;
-			updateFuel();
-		}
 
 		if (!world.isRemote && ++moveTick >= MOVE_DELAY) {
 			moveTick = 0;
@@ -391,9 +382,6 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 				AxisAlignedBB aabb = new AxisAlignedBB(x1, 0, z1, x2, 255, z2);
 				List<EntityPlayer> updatePlayers = world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb);
 				updatePlayers.removeAll(players);
-				for (EntityPlayer player : updatePlayers) {
-					sendDataToPlayer(DataType.POWER, player);
-				}
 			}
 		}
 	}
@@ -526,19 +514,9 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			sendDataToAllPlayers(DataType.LIT, players);
 		}
 
-		int weatherModifier;
-		if (getUpgradePage().hasGlobalUpgrade(Upgrade.SOLAR) && canSeeTheSky()) {
-			weatherModifier = world.isRaining() ? ConfigLoader.UPGRADES.SOLAR_GENERATION : 1;
-			if (world.isDaytime())
-				power += (ConfigLoader.UPGRADES.SOLAR_GENERATION
-						* getUpgradePage().getGlobalUpgradeCount(Upgrade.SOLAR)) / weatherModifier;
-		}
-
 		ItemStack fuel = fuelSlot.getStack();
-		if (fuel != null && fuelSlot.isItemValid(fuel)) {
+		if (!fuel.isEmpty() && fuelSlot.isItemValid(fuel)) {
 			int fuelLevel = TileEntityFurnace.getItemBurnTime(fuel);
-			fuelLevel *= 1F + getUpgradePage().getGlobalUpgradeCount(Upgrade.EFFICIENCY)
-					/ ConfigLoader.UPGRADES.FUEL_EFFICIENCY_CHANGE;
 			if (fuelLevel > 0 && fuelLevel + power <= maxPower) {
 				power += fuelLevel;
 				if (fuel.getItem().hasContainerItem(fuel)) {
@@ -553,13 +531,8 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			power = maxPower;
 		if (power != lastPower)
 			lastPower = power;
-
-		sendDataToAllPlayers(DataType.POWER, players);
 	}
 
-	public boolean canSeeTheSky() {
-		return world.canSeeSky(pos.up());
-	}
 
 	public void onUpgradeChangeDistribute() {
 		if (!world.isRemote) {
@@ -575,11 +548,6 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		reloadTransferSides();
 		getUpgradePage().onUpgradeChange();
 		getMainPage().getCraftingList().forEach(UnitCraft::onUpgradeChange);
-		maxPower = (ConfigLoader.TWEAKS.MIN_POWER
-				+ (ConfigLoader.UPGRADES.MAX_POWER_CHANGE * getUpgradePage().getGlobalUpgradeCount(Upgrade.MAX_POWER)));
-		fuelDelay = (ConfigLoader.TWEAKS.FUEL_DELAY - (ConfigLoader.UPGRADES.FUEL_DELAY_CHANGE
-				* getUpgradePage().getGlobalUpgradeCount(Upgrade.FUEL_DELAY)));
-		sendDataToAllPlayers(DataType.POWER, players);
 	}
 
 	public void onSideChange() {
@@ -873,33 +841,5 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 
 	@Override
 	public void clear() {
-	}
-
-	public int getStoredPower() {
-		return power;
-	}
-
-	public int getCapacity() {
-		return maxPower;
-	}
-
-	public int getEnergyStored(EnumFacing from) {
-		return 0;
-	}
-
-	public int getMaxEnergyStored(EnumFacing from) {
-		return 8000;
-	}
-
-	public boolean canConnectEnergy(EnumFacing from) {
-		return getUpgradePage().hasGlobalUpgrade(Upgrade.RF);
-	}
-
-	public int receiveEnergy(EnumFacing from, int energy, boolean simulate) {
-		int energyToPower = Math.min(getCapacity() - getStoredPower(), (energy / ConfigLoader.TWEAKS.POWER_CONVERSION));
-		if (!simulate)
-			power += energyToPower;
-
-		return energyToPower * ConfigLoader.TWEAKS.POWER_CONVERSION;
 	}
 }
