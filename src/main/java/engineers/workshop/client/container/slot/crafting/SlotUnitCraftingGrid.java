@@ -14,7 +14,7 @@ public class SlotUnitCraftingGrid extends SlotUnit {
 
 	@Override
 	public boolean canAcceptItem(ItemStack item) {
-		if (getHasStack() && item != null) {
+		if (getHasStack() && !item.isEmpty()) {
 			UnitCraft crafting = (UnitCraft) unit;
 
 			int own = getCount(item, getStack());

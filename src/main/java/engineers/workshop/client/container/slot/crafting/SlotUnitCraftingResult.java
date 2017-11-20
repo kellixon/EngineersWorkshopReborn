@@ -55,8 +55,8 @@ public class SlotUnitCraftingResult extends SlotUnit {
     @Override
     public ItemStack decrStackSize(int count) {
         ItemStack itemstack = getStack();
-        if (itemstack != null) {
-            putStack(null);
+        if (!itemstack.isEmpty()) {
+            putStack(ItemStack.EMPTY);
         }
         return itemstack;
     }

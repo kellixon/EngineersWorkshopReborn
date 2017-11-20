@@ -16,6 +16,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,7 @@ public class GuiMenuItem extends GuiMenu {
 
     private ItemSetting setting;
     private TransferMode mode;
+    @Nonnull
     private ItemStack item;
 
     private List<ItemStack> playerItems;
@@ -151,12 +153,12 @@ public class GuiMenuItem extends GuiMenu {
         buttons.add(new Button("Delete", 30, 11) {
             @Override
             public void clicked() {
-                item = null;
+                item = ItemStack.EMPTY;
             }
 
             @Override
             public boolean isVisible() {
-                return item != null;
+                return !item.isEmpty();
             }
         });
     }

@@ -51,7 +51,9 @@ public class BlockTable extends Block implements ITileEntityProvider {
 		setRegistryName(MODID + ":" + "blockTable");
 		setUnlocalizedName(MODID + ":" + "blockTable");
 		GameData.register_impl(this);
-		GameData.register_impl(new ItemBlock(this));
+		ItemBlock itemBlock = new ItemBlock(this);
+		itemBlock.setRegistryName(getRegistryName());
+		GameData.register_impl(itemBlock);
 		GameRegistry.registerTileEntity(TileTable.class, MODID + ":" + "blockTable");
 		setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 	}

@@ -10,6 +10,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ public abstract class ContainerBase extends Container {
     protected Slot addSlotToContainer(Slot slot) {
         slot.slotNumber = this.inventorySlots.size();
         getSlots().add(slot);
-        getItems().add(null);
+        getItems().add(ItemStack.EMPTY);
         return slot;
     }
 
@@ -70,8 +71,9 @@ public abstract class ContainerBase extends Container {
     }
 
     @Override
+    @Nonnull
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     //TODO: Ewy, fix this!

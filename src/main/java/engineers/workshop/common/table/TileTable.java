@@ -1,14 +1,12 @@
 package engineers.workshop.common.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cofh.api.energy.IEnergyReceiver;
+import cofh.redstoneflux.api.IEnergyReceiver;
 import engineers.workshop.client.container.slot.SlotBase;
 import engineers.workshop.client.container.slot.SlotFuel;
 import engineers.workshop.client.menu.GuiMenu;

@@ -112,7 +112,7 @@ public class SlotBase extends Slot {
 
 	@Override
 	public int getSlotStackLimit() {
-		return getSlotStackLimit(null);
+		return getSlotStackLimit(ItemStack.EMPTY);
 	}
 
 	public int getSlotStackLimit(ItemStack item) {

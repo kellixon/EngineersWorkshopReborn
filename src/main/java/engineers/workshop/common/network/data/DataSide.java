@@ -86,8 +86,8 @@ public abstract class DataSide extends DataBase {
 			ItemSetting setting = getSetting(table, id);
 			ItemStack itemStack = setting.getItem();
 
-			dw.writeBoolean(itemStack != null);
-			if (itemStack != null) {
+			dw.writeBoolean(!itemStack.isEmpty());
+			if (!itemStack.isEmpty()) {
 				dw.writeShort(Item.getIdFromItem(itemStack.getItem()));
 				dw.writeShort(itemStack.getItemDamage());
 				// dw.writeNBT(itemStack.getTagCompound());
@@ -107,7 +107,7 @@ public abstract class DataSide extends DataBase {
 
 				setting.setItem(item);
 			} else {
-				setting.setItem(null);
+				setting.setItem(ItemStack.EMPTY);
 			}
 		}
 	}

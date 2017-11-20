@@ -11,6 +11,9 @@ import engineers.workshop.common.loaders.ItemLoader;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
+
 public enum Upgrade {
     BLANK			(new MaxCount(0), 			    ParentType.NULL), 						// Max count = 0  (Not usable as an upgrade)
     AUTO_CRAFTER	(new MaxCount(1), 			    ParentType.CRAFTING), 					// Max count = 1
@@ -75,7 +78,8 @@ public enum Upgrade {
         return maxCount.getConfigurableMax() == 0 || maxCount.getMax() > 0;
     }
 
-    public ItemStack getItemStack() {
+	@Nonnull
+	public ItemStack getItemStack() {
         return new ItemStack(ItemLoader.itemUpgrade, 1, ordinal());
     }
 
@@ -105,7 +109,7 @@ public enum Upgrade {
         }
     }
 
-    public boolean isValid(ItemStack parent) {
+    public boolean isValid(@Nonnull ItemStack parent) {
         for (ParentType validParent : validParents) {
             if (validParent.isValidParent(parent)) {
                 return true;
@@ -125,8 +129,8 @@ public enum Upgrade {
     public enum ParentType {
 		CRAFTING("Works with Crafting Tables") {
 			@Override
-			public boolean isValidParent(ItemStack item) {
-				if (item != null){
+			public boolean isValidParent(@Nonnull ItemStack item) {
+				if (!item.isEmpty()){
 					for (String parent : ConfigLoader.MACHINES.CRAFTER_BLOCKS){
 						String[] _s = parent.replace(",", "").split("/");
 						String regName = parent;
@@ -147,8 +151,8 @@ public enum Upgrade {
 		},
 		SMELTING("Works with Furnaces") {
 			@Override
-			public boolean isValidParent(ItemStack item) {
-				if (item != null){
+			public boolean isValidParent(@Nonnull ItemStack item) {
+				if (!item.isEmpty()){
 					for (String parent : ConfigLoader.MACHINES.FURNACE_BLOCKS){
 						String[] _s = parent.replace(",", "").split("/");
 						String regName = parent;
@@ -169,8 +173,8 @@ public enum Upgrade {
 		},
 		CRUSHING("Works with Crushers") {
 			@Override
-			public boolean isValidParent(ItemStack item) {
-				if (item != null){
+			public boolean isValidParent(@Nonnull ItemStack item) {
+				if (!item.isEmpty()){
 					for (String parent : ConfigLoader.MACHINES.CRUSHER_BLOCKS){
 						String[] _s = parent.replace(",", "").split("/");
 						String regName = parent;
@@ -194,8 +198,8 @@ public enum Upgrade {
 		
 		ALLOY("Works with Alloy Smelters") {
 			@Override
-			public boolean isValidParent(ItemStack item) {
-				if (item != null){
+			public boolean isValidParent(@Nonnull ItemStack item) {
+				if (!item.isEmpty()){
 					for (String parent : ConfigLoader.MACHINES.ALLOY_BLOCKS){
 						String[] _s = parent.replace(",", "").split("/");
 						String regName = parent;
@@ -218,8 +222,8 @@ public enum Upgrade {
 		
 		STORAGE("Works with Chests") {
 			@Override
-			public boolean isValidParent(ItemStack item) {
-				if (item != null){
+			public boolean isValidParent(@Nonnull ItemStack item) {
+				if (!item.isEmpty()){
 					for (String parent : ConfigLoader.MACHINES.STORAGE_BLOCKS){
 						String[] _s = parent.replace(",", "").split("/");
 						String regName = parent;
@@ -242,13 +246,13 @@ public enum Upgrade {
 		
         GLOBAL("Upgrades the entire Table") {
             @Override
-            public boolean isValidParent(ItemStack item) {
-                return item == null;
+            public boolean isValidParent(@Nonnull ItemStack item) {
+                return item.isEmpty();
             }
         },
         NULL("you shouldn't be seeing this.") {
             @Override
-            public boolean isValidParent(ItemStack item) {
+            public boolean isValidParent(@Nonnull ItemStack item) {
                 return false;
             }
         };
@@ -259,7 +263,7 @@ public enum Upgrade {
             this.description = description;
         }
 
-        public abstract boolean isValidParent(ItemStack item);
+        public abstract boolean isValidParent(@Nonnull ItemStack item);
         
     	private static final EnumSet<ParentType> MachineSet = EnumSet.of(ParentType.CRAFTING, ParentType.SMELTING, ParentType.CRUSHING, ParentType.ALLOY);
     }
