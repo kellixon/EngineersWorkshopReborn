@@ -19,12 +19,12 @@ public class PacketHandler {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-		onPacket(event, FMLClientHandler.instance().getClient().thePlayer, false);
+		onPacket(event, FMLClientHandler.instance().getClient().player, false);
 	}
 
 	@SubscribeEvent
 	public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-		onPacket(event, ((NetHandlerPlayServer) event.getHandler()).playerEntity, true);
+		onPacket(event, ((NetHandlerPlayServer) event.getHandler()).player, true);
 	}
 
 	private void onPacket(@SuppressWarnings("rawtypes") FMLNetworkEvent.CustomPacketEvent event, EntityPlayer player,
@@ -42,7 +42,7 @@ public class PacketHandler {
 			int x = dr.readSignedInteger();
 			int y = dr.readSignedInteger();
 			int z = dr.readSignedInteger();
-			World world = player.worldObj;
+			World world = player.world;
 			if (!world.isBlockLoaded(new BlockPos(x, y, z)))
 				return;
 			TileEntity te = world.getTileEntity(new BlockPos(x, y, z));

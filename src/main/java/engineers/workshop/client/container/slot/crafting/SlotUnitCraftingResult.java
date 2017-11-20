@@ -6,6 +6,7 @@ import engineers.workshop.client.container.slot.SlotUnit;
 import engineers.workshop.client.page.Page;
 import engineers.workshop.client.page.unit.UnitCraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class SlotUnitCraftingResult extends SlotUnit {
@@ -25,9 +26,10 @@ public class SlotUnitCraftingResult extends SlotUnit {
     }
 
     @Override
-    public void onPickupFromSlot(EntityPlayer player, ItemStack item) {
-        super.onPickupFromSlot(player, item);
+    public ItemStack onTake(EntityPlayer player, ItemStack item) {
+        item = super.onTake(player, item);
         ((UnitCraft)unit).onCrafting(player, item);
+	    return item;
     }
 
     @Override

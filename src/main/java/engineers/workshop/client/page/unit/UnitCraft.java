@@ -19,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.stats.AchievementList;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -111,31 +110,6 @@ public class UnitCraft extends Unit {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
-		if (player != null) {
-			if (item == Item.getItemFromBlock(Blocks.CRAFTING_TABLE)) {
-				player.addStat(AchievementList.BUILD_WORK_BENCH, 1);
-			} else if (item instanceof ItemPickaxe) {
-				player.addStat(AchievementList.BUILD_PICKAXE, 1);
-				if (((ItemPickaxe) item).getToolMaterial() != Item.ToolMaterial.WOOD) {
-					player.addStat(AchievementList.BUILD_BETTER_PICKAXE, 1);
-				}
-			} else if (item == Item.getItemFromBlock(Blocks.FURNACE)) {
-				player.addStat(AchievementList.BUILD_FURNACE, 1);
-			} else if (item instanceof ItemHoe) {
-				player.addStat(AchievementList.BUILD_HOE, 1);
-			} else if (item == Items.BREAD) {
-				player.addStat(AchievementList.MAKE_BREAD, 1);
-			} else if (item == Items.CAKE) {
-				player.addStat(AchievementList.BAKE_CAKE, 1);
-			} else if (item instanceof ItemSword) {
-				player.addStat(AchievementList.BUILD_SWORD, 1);
-			} else if (item == Item.getItemFromBlock(Blocks.ENCHANTING_TABLE)) {
-				player.addStat(AchievementList.ENCHANTMENTS, 1);
-			} else if (item == Item.getItemFromBlock(Blocks.BOOKSHELF)) {
-				player.addStat(AchievementList.BOOKCASE, 1);
-			}
-		}
 	}
 
 	private static final int CLEAR_SRC_X = 48;
@@ -186,7 +160,7 @@ public class UnitCraft extends Unit {
 	private void onCrafting(CraftingBase crafting, boolean auto, boolean fake) {
 		for (int i = 0; i < GRID_SIZE; i++) {
 			ItemStack itemStack = crafting.getStackInSlot(i);
-			if (itemStack != null) {
+			if (!itemStack.isEmpty()) {
 				int id = i;
 				for (int j = auto ? 0 : GRID_SIZE; j < crafting.getFullSize(); j++) {
 					if (i == j)
@@ -195,7 +169,7 @@ public class UnitCraft extends Unit {
 					ItemStack other = crafting.getStackInSlot(j);
 					// TODO support ore dictionary and fuzzy etc?. Problem is
 					// that it needs to figure out if the recipe supports it
-					if (other != null && (j >= GRID_SIZE || other.stackSize > itemStack.stackSize)
+					if (!other.isEmpty() && (j >= GRID_SIZE || other.getCount() > itemStack.getCount())
 							&& itemStack.isItemEqual(other) && ItemStack.areItemStackTagsEqual(itemStack, other)) {
 						id = j;
 						itemStack = other;
@@ -345,14 +319,14 @@ public class UnitCraft extends Unit {
 		@Override
 		public ItemStack decrStackSize(int id, int count) {
 			ItemStack item = getStackInSlot(id);
-			if (item != null) {
-				if (item.stackSize <= count) {
-					setInventorySlotContents(id, null);
+			if (!item.isEmpty()) {
+				if (item.getCount() <= count) {
+					setInventorySlotContents(id, ItemStack.EMPTY);
 					return item;
 				}
 				ItemStack result = item.splitStack(count);
-				if (item.stackSize == 0) {
-					setInventorySlotContents(id, null);
+				if (item.getCount() == 0) {
+					setInventorySlotContents(id, ItemStack.EMPTY);
 				}
 				return result;
 			} else {
@@ -379,13 +353,11 @@ public class UnitCraft extends Unit {
 		}
 
 		public IRecipe getRecipe() {
-			if (isMatch(REPAIR_RECIPE)) {
-				return REPAIR_RECIPE;
-			}
+//			if (isMatch(REPAIR_RECIPE)) {
+//				return REPAIR_RECIPE;
+//			}
 
-			for (int i = 0; i < CraftingManager.getInstance().getRecipeList().size(); i++) {
-				IRecipe recipe = CraftingManager.getInstance().getRecipeList().get(i);
-
+			for(IRecipe recipe : CraftingManager.REGISTRY){
 				if (isMatch(recipe)) {
 					return recipe;
 				}
@@ -413,65 +385,65 @@ public class UnitCraft extends Unit {
 		}
 	}
 
-	private static final IRecipe REPAIR_RECIPE = new RepairRecipe();
-
-	private static class RepairRecipe implements IRecipe {
-
-		@Override
-		public boolean matches(InventoryCrafting crafting, World world) {
-			return getCraftingResult(crafting) != null;
-		}
-
-		@SuppressWarnings("deprecation")
-		@Override
-		public ItemStack getCraftingResult(InventoryCrafting crafting) {
-			Item repairItem = null;
-			int count = 0, units = 0;
-
-			for (int i = 0; i < crafting.getSizeInventory(); i++) {
-				ItemStack item = crafting.getStackInSlot(i);
-				if (item != null) {
-					if (repairItem == null) {
-						repairItem = item.getItem();
-						if (!repairItem.isRepairable()) {
-							return null;
-						}
-						units = repairItem.getMaxDamage() * 5 / 100;
-					} else if (repairItem != item.getItem() || item.stackSize != 1 || count == 2) {
-						return null;
-					}
-
-					units += item.getMaxDamage() - item.getItemDamage();
-					count++;
-				}
-			}
-
-			if (repairItem != null && count == 2) {
-				int damage = repairItem.getMaxDamage() - units;
-				if (damage < 0) {
-					damage = 0;
-				}
-				return new ItemStack(repairItem, 1, damage);
-			} else {
-				return null;
-			}
-		}
-
-		@Override
-		public int getRecipeSize() {
-			return 9;
-		}
-
-		@Override
-		public ItemStack getRecipeOutput() {
-			return null;
-		}
-
-		@Override
-		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-			return null;
-		}
-	}
+//	private static final IRecipe REPAIR_RECIPE = new RepairRecipe();
+//
+//	private static class RepairRecipe implements IRecipe {
+//
+//		@Override
+//		public boolean matches(InventoryCrafting crafting, World world) {
+//			return getCraftingResult(crafting) != null;
+//		}
+//
+//		@SuppressWarnings("deprecation")
+//		@Override
+//		public ItemStack getCraftingResult(InventoryCrafting crafting) {
+//			Item repairItem = null;
+//			int count = 0, units = 0;
+//
+//			for (int i = 0; i < crafting.getSizeInventory(); i++) {
+//				ItemStack item = crafting.getStackInSlot(i);
+//				if (!item.isEmpty()) {
+//					if (repairItem == null) {
+//						repairItem = item.getItem();
+//						if (!repairItem.isRepairable()) {
+//							return null;
+//						}
+//						units = repairItem.getMaxDamage() * 5 / 100;
+//					} else if (repairItem != item.getItem() || item.getCount() != 1 || count == 2) {
+//						return null;
+//					}
+//
+//					units += item.getMaxDamage() - item.getItemDamage();
+//					count++;
+//				}
+//			}
+//
+//			if (repairItem != null && count == 2) {
+//				int damage = repairItem.getMaxDamage() - units;
+//				if (damage < 0) {
+//					damage = 0;
+//				}
+//				return new ItemStack(repairItem, 1, damage);
+//			} else {
+//				return null;
+//			}
+//		}
+//
+//		@Override
+//		public int getRecipeSize() {
+//			return 9;
+//		}
+//
+//		@Override
+//		public ItemStack getRecipeOutput() {
+//			return null;
+//		}
+//
+//		@Override
+//		public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+//			return null;
+//		}
+//	}
 
 	@Override
 	protected int getArrowX() {
@@ -491,7 +463,7 @@ public class UnitCraft extends Unit {
 	protected ItemStack getProductionResult() {
 		if (table.getUpgradePage().hasUpgrade(id, Upgrade.AUTO_CRAFTER)) {
 			ItemStack result = table.getStackInSlot(resultId);
-			if (result != null && canAutoCraft) {
+			if (!result.isEmpty()&& canAutoCraft) {
 				return result;
 			}
 		}

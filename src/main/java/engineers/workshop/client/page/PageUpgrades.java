@@ -121,7 +121,7 @@ public class PageUpgrades extends Page {
                 if (count == null) {
                     count = 0;
                 }
-                count += itemStack.stackSize;
+                count += itemStack.getCount();
                 map.put(upgrade, count);
             }
         }

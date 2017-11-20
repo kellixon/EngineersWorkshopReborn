@@ -135,7 +135,7 @@ public class Transfer {
                     int id = itemCompound.getByte(NBT_ID);
                     ItemSetting itemSetting = items[id];
                     itemSetting.setMode(TransferMode.values()[itemCompound.getByte(NBT_MODE)]);
-                    itemSetting.setItem(ItemStack.loadItemStackFromNBT(itemCompound));
+                    itemSetting.setItem(new ItemStack(itemCompound));
                 }
             }
         }

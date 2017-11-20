@@ -68,8 +68,8 @@ public class TextureRenderer {
     public static void renderTexture(BlockPos pos, double x, double y, double z, double x1, double y1, double z1, double x2, double y2, double z2, int color) {
         final Minecraft mc = Minecraft.getMinecraft();
         final Tessellator tessellator = Tessellator.getInstance();
-        final VertexBuffer buffer = tessellator.getBuffer();
-        final int brightness = mc.theWorld.getCombinedLight(pos, 0);
+        final BufferBuilder buffer = tessellator.getBuffer();
+        final int brightness = mc.world.getCombinedLight(pos, 0);
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -103,7 +103,7 @@ public class TextureRenderer {
      * @param color      The color multiplier to apply.
      * @param brightness The brightness of the cube.
      */
-    public static void addTexturedQuad(VertexBuffer buffer, TextureAtlasSprite sprite, double x, double y, double z, double width, double height, double length, EnumFacing face, int color, int brightness) {
+    public static void addTexturedQuad(BufferBuilder buffer, TextureAtlasSprite sprite, double x, double y, double z, double width, double height, double length, EnumFacing face, int color, int brightness) {
         if (sprite == null) {
             System.out.print("No texture found at this resource location");
             return;
@@ -138,7 +138,7 @@ public class TextureRenderer {
      * @param light1 The first light map value.
      * @param light2 The second light map value.
      */
-    public static void addTextureQuad(VertexBuffer buffer, TextureAtlasSprite sprite, double x, double y, double z, double width, double height, double length, EnumFacing face, int red, int green, int blue, int alpha, int light1, int light2) {
+    public static void addTextureQuad(BufferBuilder buffer, TextureAtlasSprite sprite, double x, double y, double z, double width, double height, double length, EnumFacing face, int red, int green, int blue, int alpha, int light1, int light2) {
 
         double minU;
         double maxU;

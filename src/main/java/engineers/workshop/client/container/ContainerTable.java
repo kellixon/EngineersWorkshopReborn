@@ -8,6 +8,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public class ContainerTable extends ContainerBase {
 
     private TileTable table;
@@ -38,12 +40,13 @@ public class ContainerTable extends ContainerBase {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return table.isUseableByPlayer(player);
+        return table.isUsableByPlayer(player);
     }
 
     @Override
+    @Nonnull
     public ItemStack transferStackInSlot(EntityPlayer player, int i) {
-        ItemStack itemstack = null;
+        ItemStack itemstack = ItemStack.EMPTY;
         SlotBase slot = (SlotBase)inventorySlots.get(i);
         if(slot != null && slot.getHasStack() && slot.isVisible()) {
             ItemStack slotItem = slot.getStack();
@@ -51,21 +54,21 @@ public class ContainerTable extends ContainerBase {
             if(i < table.getSizeInventory()) {
                 if(!mergeItemStack(slotItem, table.getSizeInventory() + 28, table.getSizeInventory() + 36, false)) {
                     if(!mergeItemStack(slotItem, table.getSizeInventory(), table.getSizeInventory() + 28, false)) {
-                        return null;
+                        return ItemStack.EMPTY;
                     }
                 }
             } else if(!mergeItemStack(slotItem, 0, table.getSizeInventory(), false)){
-                return null;
+                return ItemStack.EMPTY;
             }
-            if(slotItem.stackSize == 0){
-                slot.putStack(null);
+            if(slotItem.getCount() == 0){
+                slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
-            if(slotItem.stackSize != itemstack.stackSize){
-                slot.onPickupFromSlot(player,slotItem);
+            if(slotItem.getCount() != itemstack.getCount()){
+                slot.onTake(player,slotItem);
             } else {
-                return null;
+                return ItemStack.EMPTY;
             }
         }
         return itemstack;
@@ -84,23 +87,23 @@ public class ContainerTable extends ContainerBase {
         ItemStack slotItem;
 
         if (item.isStackable()) {
-            while (item.stackSize > 0 && (!invert && id < end || invert && id >= start)) {
+            while (item.getCount() > 0 && (!invert && id < end || invert && id >= start)) {
                 slot = (SlotBase)this.inventorySlots.get(id);
                 if (slot.isVisible() && slot.canShiftClickInto(item)) {
                     slotItem = slot.getStack();
 
-                    if (slotItem != null && slotItem.stackSize > 0 && slotItem.getItem() == item.getItem() && (!item.getHasSubtypes() || item.getItemDamage() == slotItem.getItemDamage()) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
-                        int size = slotItem.stackSize + item.stackSize;
+                    if (!slotItem.isEmpty() && slotItem.getCount() > 0 && slotItem.getItem() == item.getItem() && (!item.getHasSubtypes() || item.getItemDamage() == slotItem.getItemDamage()) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
+                        int size = slotItem.getCount() + item.getCount();
 
                         int maxLimit = Math.min(item.getMaxStackSize(), slot.getSlotStackLimit(item));
                         if (size <= maxLimit) {
-                            item.stackSize = 0;
-                            slotItem.stackSize = size;
+                            item.setCount(0);
+                            slotItem.setCount(size);
                             slot.onSlotChanged();
                             result = true;
-                        }else if (slotItem.stackSize < maxLimit) {
-                            item.stackSize -= maxLimit - slotItem.stackSize;
-                            slotItem.stackSize = maxLimit;
+                        }else if (slotItem.getCount() < maxLimit) {
+                            item.setCount(maxLimit - slotItem.getCount());
+                            slotItem.setCount(maxLimit);
                             slot.onSlotChanged();
                             result = true;
                         }
@@ -115,7 +118,7 @@ public class ContainerTable extends ContainerBase {
             }
         }
 
-        if (item.stackSize > 0){
+        if (item.getCount() > 0){
             if (invert){
                 id = end - 1;
             }else{
@@ -127,18 +130,19 @@ public class ContainerTable extends ContainerBase {
                 slotItem = slot.getStack();
 
                 if (slot.isVisible() && slot.canShiftClickInto(item)) {
-                    if (slotItem == null && slot.isItemValid(item)) {
+                    if (slotItem.isEmpty() && slot.isItemValid(item)) {
                         int stackLimit = slot.getSlotStackLimit(item);
                         if (stackLimit > 0) {
-                            int stackSize = Math.min(stackLimit, item.stackSize);
+                            int stackSize = Math.min(stackLimit, item.getCount());
 
                             ItemStack newItem = item.copy();
-                            newItem.stackSize = stackSize;
-                            item.stackSize -= stackSize;
+                            newItem.setCount(stackSize);
+                            item.shrink(stackLimit);
                             slot.putStack(newItem);
                             slot.onSlotChanged();
 
-                            result = item.stackSize == 0;
+                            item.setCount(0);
+                            result = item.isEmpty();
                             break;
                         }
                     }

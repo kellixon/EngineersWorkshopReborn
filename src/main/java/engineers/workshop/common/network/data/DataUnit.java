@@ -19,16 +19,10 @@ public abstract class DataUnit extends DataBase {
     	Unit smelt = table.getMainPage().getSmeltingList().get(id);
     	Unit craft = table.getMainPage().getCraftingList().get(id);
     	Unit storage = table.getMainPage().getStorageList().get(id);
-    	Unit crush = ConfigLoader.MACHINES.CRUSHER_ENABLED ? crush = table.getMainPage().getCrushingList().get(id) : null;
-    	Unit alloy = ConfigLoader.MACHINES.ALLOY_ENABLED ? alloy = table.getMainPage().getAlloyList().get(id) : null;
 
     	
     	if(smelt.isEnabled())
     		return smelt;
-    	else if(crush != null && crush.isEnabled())
-    		return crush;
-    	else if(alloy != null && alloy.isEnabled())
-    		return alloy;
 		else if (storage.isEnabled())
 			return storage;
     	else

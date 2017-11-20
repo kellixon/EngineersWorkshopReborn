@@ -156,7 +156,7 @@ public abstract class Unit {
 		if (output == null) {
 			table.setInventorySlotContents(getOutputId(), result.copy());
 		} else {
-			table.getStackInSlot(getOutputId()).stackSize += result.stackSize;
+			table.getStackInSlot(getOutputId()).grow(result.getCount());
 		}
 
 		onProduction(result);
@@ -262,7 +262,7 @@ public abstract class Unit {
 			if (target == null) {
 				return true;
 			} else if (target.isItemEqual(source) && ItemStack.areItemStackTagsEqual(target, source)) {
-				int resultSize = target.stackSize + source.stackSize;
+				int resultSize = target.getCount() + source.getCount();
 				if (resultSize <= table.getInventoryStackLimit() && resultSize <= target.getMaxStackSize()) {
 					return true;
 				}

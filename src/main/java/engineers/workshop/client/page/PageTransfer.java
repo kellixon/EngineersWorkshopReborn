@@ -368,11 +368,11 @@ public class PageTransfer extends Page {
 					if (gui.inBounds(ITEM_X + i * ITEM_OFFSET, ITEM_Y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
 						EntityPlayer player = getPlayer();
 						ItemStack itemStack = player.inventory.getItemStack();
-						if (itemStack == null) {
+						if (itemStack.isEmpty()) {
 							table.setMenu(new GuiMenuItem(table, selectedTransfer.getItem(i)));
 						} else {
 							itemStack = itemStack.copy();
-							itemStack.stackSize = 1;
+							itemStack.setCount(1);
 							selectedTransfer.getItem(i).setItem(itemStack);
 							table.updateServer(DataType.SIDE_FILTER, getSyncId(selectedTransfer.getItem(i)));
 						}
@@ -393,7 +393,7 @@ public class PageTransfer extends Page {
 
 	@SideOnly(net.minecraftforge.fml.relauncher.Side.CLIENT)
 	private EntityPlayer getPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 
 	@Override

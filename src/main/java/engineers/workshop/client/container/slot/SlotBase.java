@@ -27,22 +27,22 @@ public class SlotBase extends Slot {
 
 	public void updateClient(boolean visible) {
 		if (visible && isEnabled()) {
-			xDisplayPosition = getX();
-			yDisplayPosition = getY();
+			xPos = getX();
+			yPos = getY();
 		} else {
-			xDisplayPosition = -9000;
-			yDisplayPosition = -9000;
+			xPos = -9000;
+			yPos = -9000;
 		}
 	}
 
 	public void updateServer() {
 		if (!isEnabled() && getHasStack()) {
 			table.spitOutItem(getStack());
-			putStack(null);
+			putStack(ItemStack.EMPTY);
 		}
 		
-		if(getHasStack() && getStack().stackSize == 0){
-			putStack(null);
+		if(getHasStack() && getStack().getCount() == 0){
+			putStack(ItemStack.EMPTY);
 		}
 	}
 
@@ -141,9 +141,9 @@ public class SlotBase extends Slot {
 
 	@SideOnly(Side.CLIENT)
 	protected static boolean shouldHighlight(SlotBase slot, SlotBase other) {
-		return Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null && slot != null
+		return Minecraft.getMinecraft().player.inventory.getItemStack().isEmpty() && slot != null
 				&& !slot.getHasStack() && other != null && other.getHasStack() && slot.isItemValid(other.getStack())
-				&& slot.getSlotStackLimit(other.getStack()) > (slot.getHasStack() ? slot.getStack().stackSize : 0);
+				&& slot.getSlotStackLimit(other.getStack()) > (slot.getHasStack() ? slot.getStack().getCount() : 0);
 	}
 
 	public boolean shouldDropOnClosing() {

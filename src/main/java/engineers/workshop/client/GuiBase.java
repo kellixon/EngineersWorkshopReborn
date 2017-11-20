@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -30,7 +31,7 @@ public abstract class GuiBase extends GuiContainer {
 		shiftMoveRendered = false;
 		for (Object obj : inventorySlots.inventorySlots) {
 			SlotBase slot = (SlotBase) obj;
-			if (isPointInRegion(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, x, y)) {
+			if (isPointInRegion(slot.xPos, slot.yPos, 16, 16, x, y)) {
 				selectedSlot = slot;
 				break;
 			}
@@ -68,13 +69,13 @@ public abstract class GuiBase extends GuiContainer {
 	public void drawString(String str, int x, int y, float multiplier, int color) {
 		GL11.glPushMatrix();
 		GL11.glScalef(multiplier, multiplier, 1F);
-		fontRendererObj.drawString(str, (int) (x / multiplier), (int) (y / multiplier), color);
+		fontRenderer.drawString(str, (int) (x / multiplier), (int) (y / multiplier), color);
 
 		GL11.glPopMatrix();
 	}
 
 	public void drawCenteredString(String str, int x, int y, int width, float multiplier, int color) {
-		drawString(str, x + (width - (int) (fontRendererObj.getStringWidth(str) * multiplier)) / 2, y, multiplier, color);
+		drawString(str, x + (width - (int) (fontRenderer.getStringWidth(str) * multiplier)) / 2, y, multiplier, color);
 	}
 
 	public void drawItem(ItemStack item, int x, int y) {
@@ -129,7 +130,7 @@ public abstract class GuiBase extends GuiContainer {
 	}
 
 	public int getStringWidth(String str) {
-		return fontRendererObj.getStringWidth(str);
+		return fontRenderer.getStringWidth(str);
 	}
 
 	public void drawCursor(int x, int y, int z, float size, int color) {
@@ -174,7 +175,7 @@ public abstract class GuiBase extends GuiContainer {
 		int w = 0;
 
 		for (String line : mouseOver) {
-			int l = fontRendererObj.getStringWidth(line);
+			int l = fontRenderer.getStringWidth(line);
 
 			if (l > w) {
 				w = l;
@@ -216,7 +217,7 @@ public abstract class GuiBase extends GuiContainer {
 
 		for (int i = 0; i < mouseOver.size(); i++) {
 			String line = mouseOver.get(i);
-			fontRendererObj.drawStringWithShadow(line, x, y, -1);
+			fontRenderer.drawStringWithShadow(line, x, y, -1);
 
 			if (i == 0) {
 				y += 2;
@@ -251,7 +252,7 @@ public abstract class GuiBase extends GuiContainer {
 
 		try {
 			// noinspection unchecked
-			return item.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+			return item.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
 		} catch (Throwable ignored) {
 			return null;
 		}

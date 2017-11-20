@@ -9,6 +9,8 @@ import engineers.workshop.common.table.TileTable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 
+import javax.annotation.Nonnull;
+
 public class UnitSmelt extends Unit {
 
     public UnitSmelt(TileTable table, Page page, int id, int x, int y) {
@@ -63,19 +65,16 @@ public class UnitSmelt extends Unit {
 
                 ItemStack target = table.getStackInSlot(targetId);
                 ItemStack source = table.getStackInSlot(sourceId);
-                if (source != null) {
+                if (!source.isEmpty()) {
                     ItemStack move = source.copy();
-                    move.stackSize = 1;
+                    move.setCount(1);
                     if (canMove(move, target)) {
-                        if (target == null) {
+                        if (target.isEmpty()) {
                             table.setInventorySlotContents(targetId, move);
                         } else {
-                            target.stackSize++;
+                            target.grow(1);
                         }
-                        source.stackSize--;
-                        if (source.stackSize == 0) {
-                            table.setInventorySlotContents(sourceId, null);
-                        }
+                        source.shrink(1);
                     }
                 }
             }
@@ -83,9 +82,10 @@ public class UnitSmelt extends Unit {
     }
 
     @Override
+    @Nonnull
     protected ItemStack getProductionResult() {
         ItemStack input = table.getStackInSlot(inputId);
-        return input == null ? null : FurnaceRecipes.instance().getSmeltingResult(input);
+        return input.isEmpty() ? ItemStack.EMPTY : FurnaceRecipes.instance().getSmeltingResult(input);
     }
 
     @Override

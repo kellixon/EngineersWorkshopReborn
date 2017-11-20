@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.registries.GameData;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -49,8 +50,8 @@ public class BlockTable extends Block implements ITileEntityProvider {
 		setCreativeTab(CreativeTabLoader.tabWorkshop);
 		setRegistryName(MODID + ":" + "blockTable");
 		setUnlocalizedName(MODID + ":" + "blockTable");
-		GameRegistry.register(this);
-		GameRegistry.register(new ItemBlock(this), getRegistryName());
+		GameData.register_impl(this);
+		GameData.register_impl(new ItemBlock(this));
 		GameRegistry.registerTileEntity(TileTable.class, MODID + ":" + "blockTable");
 		setDefaultState(blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 	}
@@ -124,7 +125,7 @@ public class BlockTable extends Block implements ITileEntityProvider {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			FMLNetworkHandler.openGui(playerIn, EngineersWorkshop.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
@@ -181,7 +182,7 @@ public class BlockTable extends Block implements ITileEntityProvider {
 				for (SlotBase slot : table.getSlots()) {
 					if (slot.shouldDropOnClosing()) {
 						ItemStack itemStack = slot.getStack();
-						if (itemStack != null && itemStack.stackSize > 0) {
+						if (!itemStack.isEmpty()) {
 							Random random = new Random();
 
 							float dX = random.nextFloat() * 0.8F + 0.1F;
@@ -191,7 +192,7 @@ public class BlockTable extends Block implements ITileEntityProvider {
 							EntityItem entityItem = new EntityItem(world, (double) ((float) x + dX),
 									(double) ((float) y + dY), (double) ((float) z + dZ), itemStack.copy());
 							if (itemStack.hasTagCompound()) {
-								entityItem.getEntityItem().setTagCompound(itemStack.getTagCompound().copy());
+								entityItem.getItem().setTagCompound(itemStack.getTagCompound().copy());
 							}
 							float factor = 0.05F;
 
@@ -199,8 +200,8 @@ public class BlockTable extends Block implements ITileEntityProvider {
 							entityItem.motionX = random.nextGaussian() * (double) factor + 0.2D;
 							entityItem.motionX = random.nextGaussian() * (double) factor;
 
-							world.spawnEntityInWorld(entityItem);
-							itemStack.stackSize = 0;
+							world.spawnEntity(entityItem);
+							itemStack.setCount(0);
 						}
 					}
 				}

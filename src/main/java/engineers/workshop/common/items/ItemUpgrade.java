@@ -2,12 +2,16 @@ package engineers.workshop.common.items;
 
 import engineers.workshop.common.loaders.CreativeTabLoader;
 import engineers.workshop.common.loaders.ItemLoader;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.GameData;
 
 import java.util.List;
 
@@ -19,7 +23,7 @@ public class ItemUpgrade extends Item {
 		setCreativeTab(CreativeTabLoader.tabWorkshop);
 		setHasSubtypes(true);
 		setRegistryName(MODID + ":" + "upgrade");
-		GameRegistry.register(this);
+		GameData.register_impl(this);
 	}
 
 	@Override
@@ -37,7 +41,10 @@ public class ItemUpgrade extends Item {
 	}
 
 	@Override
-	public void getSubItems(Item item, CreativeTabs tab, List<ItemStack> lst) {
+	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> lst) {
+		if(!isInCreativeTab(tab)){
+			return;
+		}
 		for (int i = 0; i < Upgrade.values().length; ++i) {
 			Upgrade[] upgrades = Upgrade.values().clone();
 			lst.add(upgrades[i].getItemStack());
@@ -45,7 +52,7 @@ public class ItemUpgrade extends Item {
 	}
 
 	@Override
-	public void addInformation(ItemStack item, EntityPlayer player, List<String> list, boolean useExtraInfo) {
+	public void addInformation(ItemStack item, World world, List<String> list, ITooltipFlag useExtraInfo) {
 		Upgrade upgrade = getUpgrade(item);
 		if (upgrade != null) {
 			upgrade.addInfo(list);

@@ -1,8 +1,11 @@
 package engineers.workshop.common.table;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import cofh.api.energy.IEnergyReceiver;
@@ -36,6 +39,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -122,6 +126,16 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		return items.length;
 	}
 
+	@Override
+	public boolean isEmpty() {
+		for(ItemStack stack : items){
+			if(!stack.isEmpty()){
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public PageMain getMainPage() {
 		return (PageMain) pages.get(0);
 	}
@@ -135,34 +149,31 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	}
 
 	@Override
+	@Nonnull
 	public ItemStack getStackInSlot(int id) {
 		return items[id];
 	}
 
 	@Override
+	@Nonnull
 	public ItemStack decrStackSize(int id, int count) {
 		ItemStack item = getStackInSlot(id);
-		if (item != null) {
-			if (item.stackSize <= count) {
-				setInventorySlotContents(id, null);
+		if (!item.isEmpty()) {
+			if (item.getCount() <= count) {
+				setInventorySlotContents(id, ItemStack.EMPTY);
 				return item;
 			}
-
-			ItemStack result = item.splitStack(count);
-
-			if (item.stackSize == 0) {
-				setInventorySlotContents(id, null);
-			}
-			return result;
+			return item.splitStack(count);
 		} else {
-			return null;
+			return ItemStack.EMPTY;
 		}
 	}
 
+	@Nonnull
 	public ItemStack getStackInSlotOnClosing(int id) {
 		if (slots.get(id).shouldDropOnClosing()) {
 			ItemStack item = getStackInSlot(id);
-			setInventorySlotContents(id, null);
+			setInventorySlotContents(id, ItemStack.EMPTY);
 			return item;
 		} else {
 			return null;
@@ -180,7 +191,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer player) {
 		return player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64;
 	}
 
@@ -345,13 +356,13 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			firstUpdate = false;
 		}
 
-		if (!worldObj.isRemote && ++fuelTick >= fuelDelay) {
-			lit = worldObj.canSeeSky(pos.up());
+		if (!world.isRemote && ++fuelTick >= fuelDelay) {
+			lit = world.canSeeSky(pos.up());
 			fuelTick = 0;
 			updateFuel();
 		}
 
-		if (!worldObj.isRemote && ++moveTick >= MOVE_DELAY) {
+		if (!world.isRemote && ++moveTick >= MOVE_DELAY) {
 			moveTick = 0;
 			if (getUpgradePage().hasGlobalUpgrade(Upgrade.AUTO_TRANSFER)) {
 				int transferSize = (int) Math.pow(2, getUpgradePage().getGlobalUpgradeCount(Upgrade.TRANSFER));
@@ -364,7 +375,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			}
 		}
 
-		if (!worldObj.isRemote && ++slotTick >= SLOT_DELAY) {
+		if (!world.isRemote && ++slotTick >= SLOT_DELAY) {
 			slotTick = 0;
 			// Logger.info(slots.stream().filter(SlotBase::getHasStack).filter(slot
 			// -> slot instanceof SlotUpgrade)
@@ -372,14 +383,14 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			slots.stream().filter(SlotBase::isEnabled).forEach(SlotBase::updateServer);
 		}
 
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			if (tickCount % 20 == 0) {
 				int x1 = getPos().getX() - 16;
 				int x2 = getPos().getX() + 16;
 				int z1 = getPos().getY() - 16;
 				int z2 = getPos().getY() + 16;
 				AxisAlignedBB aabb = new AxisAlignedBB(x1, 0, z1, x2, 255, z2);
-				List<EntityPlayer> updatePlayers = worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, aabb);
+				List<EntityPlayer> updatePlayers = world.getEntitiesWithinAABB(EntityPlayerMP.class, aabb);
 				updatePlayers.removeAll(players);
 				for (EntityPlayer player : updatePlayers) {
 					sendDataToPlayer(DataType.POWER, player);
@@ -393,7 +404,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			EnumFacing direction = side.getDirection();
 			BlockPos nPos = pos.add(direction.getFrontOffsetX(), direction.getFrontOffsetY(),
 					direction.getFrontOffsetZ());
-			TileEntity te = worldObj.getTileEntity(nPos);
+			TileEntity te = world.getTileEntity(nPos);
 			if (te instanceof IInventory) {
 				IInventory inventory = (IInventory) te;
 				/*
@@ -448,29 +459,26 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 
 			for (int fromSlot : fromSlots) {
 				ItemStack fromItem = from.getStackInSlot(fromSlot);
-				if (fromItem != null && fromItem.stackSize > 0) {
+				if (!fromItem.isEmpty() && fromItem.getCount() > 0) {
 					if (fromSided == null || fromSided.canExtractItem(fromSlot, fromItem, fromSide)) {
 						if (fromItem.isStackable()) {
 							for (int toSlot : toSlots) {
 								ItemStack toItem = to.getStackInSlot(toSlot);
-								if (toItem != null && toItem.stackSize > 0) {
+								if (!toItem.isEmpty() && toItem.getCount() > 0) {
 									if (toSided == null || toSided.canInsertItem(toSlot, fromItem, toSide)) {
 										if (fromItem.isItemEqual(toItem)
 												&& ItemStack.areItemStackTagsEqual(toItem, fromItem)) {
 											int maxSize = Math.min(toItem.getMaxStackSize(),
 													to.getInventoryStackLimit());
-											int maxMove = Math.min(maxSize - toItem.stackSize,
-													Math.min(maxTransfer, fromItem.stackSize));
-											toItem.stackSize += maxMove;
+											int maxMove = Math.min(maxSize - toItem.getCount(),
+													Math.min(maxTransfer, fromItem.getCount()));
+											toItem.grow(maxMove);
 											maxTransfer -= maxMove;
-											fromItem.stackSize -= maxMove;
-											if (fromItem.stackSize == 0) {
-												from.setInventorySlotContents(fromSlot, null);
-											}
+											fromItem.shrink(maxMove);
 
 											if (maxTransfer == 0) {
 												return;
-											} else if (fromItem.stackSize == 0) {
+											} else if (fromItem.isEmpty()) {
 												break;
 											}
 										}
@@ -478,24 +486,20 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 								}
 							}
 						}
-						if (fromItem.stackSize > 0) {
+						if (fromItem.getCount() > 0) {
 							for (int toSlot : toSlots) {
 								ItemStack toItem = to.getStackInSlot(toSlot);
-								if (toItem == null && to.isItemValidForSlot(toSlot, fromItem)) {
+								if (toItem.isEmpty() && to.isItemValidForSlot(toSlot, fromItem)) {
 									if (toSided == null || toSided.canInsertItem(toSlot, fromItem, toSide)) {
 										toItem = fromItem.copy();
-										toItem.stackSize = Math.min(maxTransfer, fromItem.stackSize);
+										toItem.setCount(Math.min(maxTransfer, fromItem.getCount()));
 										to.setInventorySlotContents(toSlot, toItem);
-										maxTransfer -= toItem.stackSize;
-										fromItem.stackSize -= toItem.stackSize;
-
-										if (fromItem.stackSize == 0) {
-											from.setInventorySlotContents(fromSlot, null);
-										}
+										maxTransfer -= toItem.getCount();
+										fromItem.shrink(toItem.getCount());
 
 										if (maxTransfer == 0) {
 											return;
-										} else if (fromItem.stackSize == 0) {
+										} else if (fromItem.isEmpty()) {
 											break;
 										}
 									}
@@ -525,8 +529,8 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 
 		int weatherModifier;
 		if (getUpgradePage().hasGlobalUpgrade(Upgrade.SOLAR) && canSeeTheSky()) {
-			weatherModifier = worldObj.isRaining() ? ConfigLoader.UPGRADES.SOLAR_GENERATION : 1;
-			if (worldObj.isDaytime())
+			weatherModifier = world.isRaining() ? ConfigLoader.UPGRADES.SOLAR_GENERATION : 1;
+			if (world.isDaytime())
 				power += (ConfigLoader.UPGRADES.SOLAR_GENERATION
 						* getUpgradePage().getGlobalUpgradeCount(Upgrade.SOLAR)) / weatherModifier;
 		}
@@ -555,13 +559,13 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	}
 
 	public boolean canSeeTheSky() {
-		return worldObj.canSeeSky(pos.up());
+		return world.canSeeSky(pos.up());
 	}
 
 	public void onUpgradeChangeDistribute() {
-		if (!worldObj.isRemote) {
+		if (!world.isRemote) {
 			onUpgradeChange();
-			worldObj.notifyNeighborsOfStateChange(pos, BlockLoader.blockTable);
+			world.notifyNeighborsOfStateChange(pos, BlockLoader.blockTable, true);
 			sendToAllPlayers(PacketHandler.getWriter(this, PacketId.UPGRADE_CHANGE), players);
 		} else {
 			getUpgradePage().onUpgradeChange();
@@ -745,7 +749,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 				id += 256;
 			}
 			if (id >= 0 && id < items.length) {
-				items[id] = ItemStack.loadItemStackFromNBT(slotCompound);
+				items[id] = new ItemStack(slotCompound);
 			}
 		}
 
@@ -781,15 +785,15 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	public void spitOutItem(ItemStack item) {
 
 		float offsetX, offsetY, offsetZ;
-		offsetX = offsetY = offsetZ = worldObj.rand.nextFloat() * 0.8F + 1.0F;
+		offsetX = offsetY = offsetZ = world.rand.nextFloat() * 0.8F + 1.0F;
 
-		EntityItem entityItem = new EntityItem(worldObj, pos.getX() + offsetX, pos.getY() + offsetY,
+		EntityItem entityItem = new EntityItem(world, pos.getX() + offsetX, pos.getY() + offsetY,
 				pos.getZ() + offsetZ, item.copy());
-		entityItem.motionX = worldObj.rand.nextGaussian() * 0.05F;
-		entityItem.motionY = worldObj.rand.nextGaussian() * 0.05F + 0.2F;
-		entityItem.motionZ = worldObj.rand.nextGaussian() * 0.05F;
+		entityItem.motionX = world.rand.nextGaussian() * 0.05F;
+		entityItem.motionY = world.rand.nextGaussian() * 0.05F + 0.2F;
+		entityItem.motionZ = world.rand.nextGaussian() * 0.05F;
 
-		worldObj.spawnEntityInWorld(entityItem);
+		world.spawnEntity(entityItem);
 	}
 
 	private static final IBitCount GRID_ID_BITS = new LengthCount(4);
@@ -808,14 +812,14 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			for (int i = 0; i < from.length; i++) {
 				from[i] = crafting.getGridId() + i;
 			}
-			int[] to = new int[player.inventory.mainInventory.length];
+			int[] to = new int[player.inventory.mainInventory.size()];
 			for (int i = 0; i < to.length; i++) {
 				to[i] = i;
 			}
 
 			for (int i = 0; i < 9; i++) {
 				ItemStack fromCrafting = crafting.getSlots().get(i).getStack();
-				if (fromCrafting != null) {
+				if (!fromCrafting.isEmpty()) {
 					player.inventory.addItemStackToInventory(fromCrafting);
 				}
 			}
@@ -841,6 +845,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	}
 
 	@Override
+	@Nonnull
 	public ItemStack removeStackFromSlot(int index) {
 		return slots.get(index).getStack().copy();
 	}

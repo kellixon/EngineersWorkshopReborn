@@ -28,7 +28,7 @@ public class SlotUpgrade extends SlotTable {
 			Upgrade upgrade = ItemUpgrade.getUpgrade(item);
 			if (upgrade != null) {
 				int count = table.getUpgradePage().getUpgradeCount(upgradeSection, upgrade);
-				return Math.min(64, upgrade.getMaxCount() - count + (getStack() != null ? getStack().stackSize : 0));
+				return Math.min(64, upgrade.getMaxCount() - count + (!getStack().isEmpty() ? getStack().getCount() : 0));
 			} else {
 				return super.getSlotStackLimit(item);
 			}

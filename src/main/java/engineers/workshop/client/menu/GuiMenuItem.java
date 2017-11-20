@@ -9,9 +9,12 @@ import engineers.workshop.client.component.TextBox;
 import engineers.workshop.client.page.setting.ItemSetting;
 import engineers.workshop.client.page.setting.TransferMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -165,12 +168,12 @@ public class GuiMenuItem extends GuiMenu {
         if (search != null && !search.isEmpty()) {
             search = search.toLowerCase();
 
-            List<ItemStack> itemStacks = new ArrayList<>();
+            NonNullList<ItemStack> itemStacks = NonNullList.create();
             for (Object obj : Item.REGISTRY) {
                 Item item = (Item)obj;
 
                 if (item != null) {
-                    item.getSubItems(item, null, itemStacks);
+                    item.getSubItems(CreativeTabs.SEARCH, itemStacks);
                 }
             }
 
@@ -184,7 +187,7 @@ public class GuiMenuItem extends GuiMenu {
 
                 try {
                     //noinspection unchecked
-                    description = element.getTooltip(Minecraft.getMinecraft().thePlayer, Minecraft.getMinecraft().gameSettings.advancedItemTooltips);
+                    description = element.getTooltip(Minecraft.getMinecraft().player, Minecraft.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
                 }catch (Throwable ex) {
                     itemIterator.remove();
                     continue;
@@ -211,13 +214,13 @@ public class GuiMenuItem extends GuiMenu {
 
     private void loadPlayerItems() {
         playerItems = new ArrayList<>();
-        IInventory inventory = Minecraft.getMinecraft().thePlayer.inventory;
+        IInventory inventory = Minecraft.getMinecraft().player.inventory;
         int itemLength = inventory.getSizeInventory();
         for (int i = 0; i < itemLength; i++) {
             ItemStack item = inventory.getStackInSlot(i);
-            if (item != null) {
+            if (!item.isEmpty()) {
                 item = item.copy();
-                item.stackSize = 1;
+                item.setCount(1);
                 boolean exists = false;
                 for (ItemStack other : playerItems) {
                     if (ItemStack.areItemStacksEqual(item, other)) {
@@ -288,7 +291,7 @@ public class GuiMenuItem extends GuiMenu {
 
             if (gui.inBounds(ITEMS_X + ITEMS_OFFSET * x, ITEMS_Y + ITEMS_OFFSET * y, ITEM_SIZE, ITEM_SIZE, mX, mY)) {
                 item = getItemList().get(i).copy();
-                item.stackSize = 1;
+                item.setCount(1);
                 break;
             }
         }

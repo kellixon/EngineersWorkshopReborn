@@ -1,12 +1,10 @@
 package engineers.workshop.common.loaders;
 
-import engineers.workshop.client.page.unit.UnitCrush;
 import engineers.workshop.common.items.Upgrade;
 import engineers.workshop.common.util.Logger;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import reborncore.common.util.RebornCraftingHelper;
 
 import static net.minecraft.init.Blocks.*;
 import static net.minecraft.init.Items.*;
@@ -14,7 +12,7 @@ import static net.minecraft.init.Items.*;
 public class RecipeLoader {
 
     public static void loadRecipes() {
-        GameRegistry.addRecipe(new ShapedOreRecipe(BlockLoader.blockTable, "PPP", "CUC", "CCC", 'P', PLANKS, 'C', COBBLESTONE, 'U', Upgrade.BLANK.getItemStack()));
+	    RebornCraftingHelper.addShapedOreRecipe(new ItemStack(BlockLoader.blockTable), "PPP", "CUC", "CCC", 'P', PLANKS, 'C', COBBLESTONE, 'U', Upgrade.BLANK.getItemStack());
 
         addRecipe(Upgrade.BLANK, "SP", "PS", 'S', STONE, 'P', PLANKS);
         addRecipe(Upgrade.STORAGE, "C", "U", 'C', Blocks.CHEST, 'U', Upgrade.BLANK.getItemStack());
@@ -31,13 +29,11 @@ public class RecipeLoader {
         addRecipe(Upgrade.FUEL_DELAY, "IRI", "LUL", "IRI", 'I', IRON_INGOT, 'R', REDSTONE, 'L', new ItemStack(DYE, 1, 4), 'U', Upgrade.SPEED.getItemStack());
         addRecipe(Upgrade.MAX_POWER, "GRG", "RTR", "GUG", 'G', GOLD_INGOT, 'T', TRAPPED_CHEST, 'R', REDSTONE_BLOCK, 'U', Upgrade.STORAGE.getItemStack());
         addRecipe(Upgrade.AXE, "FAF", "RUR", "III", 'F', FLINT, 'A', IRON_AXE, 'R', REDSTONE, 'U', Upgrade.BLANK.getItemStack(), 'I', IRON_BARS);
-        
-    	UnitCrush.addLogSawRecipies();
     }
 
     private static void addRecipe(Upgrade upgrade, Object ... recipe) {
         if (upgrade.isEnabled()) {
-            GameRegistry.addRecipe(new ShapedOreRecipe(upgrade.getItemStack(), recipe));
+	        RebornCraftingHelper.addShapedOreRecipe(upgrade.getItemStack(), recipe);
             Logger.info(upgrade + " recipe loaded.");
         }
     }

@@ -13,6 +13,6 @@ public class CreativeTabLoader {
             return new ItemStack(BlockLoader.blockTable);
         }
         @Override
-        public Item getTabIconItem() {return null;}
+        public ItemStack getTabIconItem() {return null;}
     };
 }

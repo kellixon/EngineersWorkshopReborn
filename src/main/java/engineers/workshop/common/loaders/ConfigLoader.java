@@ -91,7 +91,6 @@ public final class ConfigLoader {
 	
 	public static class MACHINES extends ConfigHandler {
 
-		public static boolean CRUSHER_ENABLED, ALLOY_ENABLED;
 		public static String[] CRAFTER_BLOCKS, FURNACE_BLOCKS, CRUSHER_BLOCKS, ALLOY_BLOCKS, STORAGE_BLOCKS;
 
 		public MACHINES(Configuration config, String category) {
@@ -100,10 +99,7 @@ public final class ConfigLoader {
 
 		@Override
 		public void load() {
-			CRUSHER_ENABLED = config.getBoolean("Enable Crusher", "Machines", true,
-					"Is a crusher allowed as a machine? (Requires EnderIO)") && Loader.isModLoaded("EnderIO");
-			ALLOY_ENABLED = config.getBoolean("Enable Alloy Smelter", "Machines", true,
-					"Is an alloy smelter allowed as a machine? (Requires EnderIO)") && Loader.isModLoaded("EnderIO");
+
 			CRAFTER_BLOCKS = config.getStringList("Crafter Blocks", "Machines", new String[]{"minecraft:crafting_table"}, "What blocks should the table accept for crafters.");
 			FURNACE_BLOCKS = config.getStringList("Furnace Blocks", "Machines", new String[]{"minecraft:furnace"}, "What blocks should the table accept for furances.");
 			CRUSHER_BLOCKS = config.getStringList("Crusher Blocks", "Machines", new String[]{"enderio:blockSagMill"}, "What blocks should the table accept for crushers.");

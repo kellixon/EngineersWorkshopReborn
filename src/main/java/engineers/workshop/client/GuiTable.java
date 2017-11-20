@@ -84,7 +84,7 @@ public class GuiTable extends GuiBase {
             super.keyTyped(c, k);
         }else{
             if (k == 1) {
-                this.mc.thePlayer.closeScreen();
+                this.mc.player.closeScreen();
             }else{
                 table.getMenu().onKeyStroke(this, c, k);
             }

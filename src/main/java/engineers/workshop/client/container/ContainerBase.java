@@ -6,12 +6,14 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /*
@@ -50,8 +52,10 @@ public abstract class ContainerBase extends Container {
     }
 
     @Override
-    public List<ItemStack> getInventory() {
-        List<ItemStack> result = getSlots().stream().map(Slot::getStack).collect(Collectors.toList());
+    public NonNullList<ItemStack> getInventory() {
+
+	    NonNullList<ItemStack> result = NonNullList.withSize(getSlots().size(), ItemStack.EMPTY);
+	    getSlots().forEach(slot -> result.add(slot.getStack()));
         return result;
     }
 
@@ -386,8 +390,8 @@ public abstract class ContainerBase extends Container {
         if (slot != null && slot.getHasStack()) {
             ItemStack slotItem = slot.getStack();
             if (playerItem != null && playerItem.isItemEqual(slotItem) && ItemStack.areItemStackTagsEqual(slotItem, playerItem)) {
-                int moveSize = partiallyMove ? 0 : playerItem.stackSize;
-                return slot.getStack().stackSize + moveSize <= playerItem.getMaxStackSize();
+                int moveSize = partiallyMove ? 0 : playerItem.getCount();
+                return slot.getStack().getCount() + moveSize <= playerItem.getMaxStackSize();
             }else{
                 return false;
             }
@@ -410,13 +414,13 @@ public abstract class ContainerBase extends Container {
         getSlot(slotId).putStack(item);
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void putStacksInSlots(ItemStack[] items) {
-        for (int i = 0; i < items.length; ++i) {
-            putStackInSlot(i, items[i]);
-        }
-    }
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public void putStacksInSlots(ItemStack[] items) {
+//        for (int i = 0; i < items.length; ++i) {
+//            putStackInSlot(i, items[i]);
+//        }
+//    }
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -458,22 +462,22 @@ public abstract class ContainerBase extends Container {
 
 
         if (item.isStackable()) {
-            while (item.stackSize > 0 && (!invert && index < end || invert && index >= start)) {
+            while (item.getCount() > 0 && (!invert && index < end || invert && index >= start)) {
                 Slot slot = getSlot(index);
                 ItemStack slotItem = slot.getStack();
 
-                if (slotItem != null && slotItem.getItem() == item.getItem() && (!item.getHasSubtypes() || item.getItemDamage() == slotItem.getItemDamage()) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
-                    int newSize = slotItem.stackSize + item.stackSize;
+                if (!slotItem.isEmpty() && slotItem.getItem() == item.getItem() && (!item.getHasSubtypes() || item.getItemDamage() == slotItem.getItemDamage()) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
+                    int newSize = slotItem.getCount() + item.getCount();
 
                     if (newSize <= item.getMaxStackSize()) {
-                        item.stackSize = 0;
-                        slotItem.stackSize = newSize;
+                        item.setCount(0);
+                        slotItem.setCount(newSize);
                         slot.onSlotChanged();
                         moved = true;
 
-                    }else if (slotItem.stackSize < item.getMaxStackSize()) {
-                        item.stackSize -= item.getMaxStackSize() - slotItem.stackSize;
-                        slotItem.stackSize = item.getMaxStackSize();
+                    }else if (slotItem.getCount() < item.getMaxStackSize()) {
+                        item.shrink(item.getMaxStackSize() - slotItem.getCount());
+                        slotItem.setCount(item.getMaxStackSize());
                         slot.onSlotChanged();
                         moved = true;
                     }
@@ -483,7 +487,7 @@ public abstract class ContainerBase extends Container {
             }
         }
 
-        if (item.stackSize > 0) {
+        if (item.getCount() > 0) {
             if (invert) {
                 index = end - 1;
             }else {
@@ -494,10 +498,10 @@ public abstract class ContainerBase extends Container {
                 Slot slot = getSlot(index);
                 ItemStack slotItem = slot.getStack();
 
-                if (slotItem == null) {
+                if (slotItem.isEmpty()) {
                     slot.putStack(item.copy());
                     slot.onSlotChanged();
-                    item.stackSize = 0;
+                    item.setCount(0);
                     moved = true;
                     break;
                 }

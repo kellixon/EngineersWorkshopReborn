@@ -5,9 +5,7 @@ import engineers.workshop.client.container.slot.SlotUnit;
 import engineers.workshop.client.page.Page;
 import engineers.workshop.client.page.unit.Unit;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.AchievementList;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class SlotUnitFurnaceResult extends SlotUnit {
@@ -37,14 +35,10 @@ public class SlotUnitFurnaceResult extends SlotUnit {
     }
 
     @Override
-    public void onPickupFromSlot(EntityPlayer player, ItemStack item) {
-        super.onPickupFromSlot(player, item);
+    public ItemStack onTake(EntityPlayer player, ItemStack item) {
+	    item = super.onTake(player, item);
         FMLCommonHandler.instance().firePlayerSmeltedEvent(player, item);
-        item.onCrafting(player.getEntityWorld(), player, item.stackSize);
-        if (item.getItem() == Items.IRON_INGOT){
-            player.addStat(AchievementList.ACQUIRE_IRON, 1);
-        } else if (item.getItem() == Items.COOKED_FISH) {
-            player.addStat(AchievementList.COOK_FISH, 1);
-        }
+        item.onCrafting(player.getEntityWorld(), player, item.getCount());
+        return item;
     }
 }

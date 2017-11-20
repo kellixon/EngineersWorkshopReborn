@@ -12,7 +12,7 @@ public class PowerTESR extends TileEntitySpecialRenderer <TileTable> {
     //(double) te.getStoredPower() / (double) te.getCapacity()
 
     @Override
-    public void renderTileEntityAt(TileTable te, double x, double y, double z, float partialTicks, int destroyStage) {
+    public void render(TileTable te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (te != null) {
             GlStateManager.pushMatrix();
             GlStateManager.enableBlend();
@@ -25,6 +25,5 @@ public class PowerTESR extends TileEntitySpecialRenderer <TileTable> {
             GlStateManager.popMatrix();
         }
     }
-
 
 }

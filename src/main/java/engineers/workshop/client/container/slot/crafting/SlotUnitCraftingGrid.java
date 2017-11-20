@@ -36,8 +36,8 @@ public class SlotUnitCraftingGrid extends SlotUnit {
 	}
 
 	private int getCount(ItemStack item, ItemStack slotItem) {
-		if (slotItem != null && slotItem.isItemEqual(item) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
-			return slotItem.stackSize;
+		if (!slotItem.isEmpty() && slotItem.isItemEqual(item) && ItemStack.areItemStackTagsEqual(item, slotItem)) {
+			return slotItem.getCount();
 		} else {
 			return -1;
 		}
