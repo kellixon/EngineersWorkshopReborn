@@ -32,7 +32,7 @@ public class UnitStorage extends Unit {
 
     @Override
     protected ItemStack getProductionResult() {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class UnitStorage extends Unit {
     @Override
     public boolean isEnabled() {
         ItemStack item = table.getUpgradePage().getUpgradeMainItem(id);
-        return item != null && Upgrade.ParentType.STORAGE.isValidParent(item);
+        return !item.isEmpty() && Upgrade.ParentType.STORAGE.isValidParent(item);
     }
 
 }
