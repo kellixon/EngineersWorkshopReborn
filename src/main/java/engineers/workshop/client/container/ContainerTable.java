@@ -5,6 +5,7 @@ import engineers.workshop.client.container.slot.SlotBase;
 import engineers.workshop.client.container.slot.SlotPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -13,6 +14,7 @@ import javax.annotation.Nonnull;
 public class ContainerTable extends ContainerBase {
 
     private TileTable table;
+    public int power;
 
     public ContainerTable(TileTable table, EntityPlayer player) {
         this.table = table;
@@ -175,4 +177,31 @@ public class ContainerTable extends ContainerBase {
     public TileTable getTable() {
         return table;
     }
+
+	@Override
+	public void addListener(IContainerListener listener) {
+		super.addListener(listener);
+		listener.sendAllWindowProperties(this, table);
+	}
+
+
+	@Override
+	public void detectAndSendChanges() {
+		super.detectAndSendChanges();
+
+		for (int i = 0; i < this.listeners.size(); ++i) {
+			IContainerListener icontainerlistener = this.listeners.get(i);
+			if(this.power != table.getPower()){
+				icontainerlistener.sendWindowProperty(this, 0, table.getPower());
+			}
+		}
+	}
+
+	@Override
+	public void updateProgressBar(int id, int data) {
+		super.updateProgressBar(id, data);
+		if(id == 0){
+			this.power = data;
+		}
+	}
 }

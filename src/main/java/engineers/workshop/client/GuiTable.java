@@ -24,6 +24,7 @@ public class GuiTable extends GuiBase {
 
     private TileTable table;
     private List<SlotBase> slots;
+    private ContainerTable containerTable;
 
     public GuiTable(TileTable table, EntityPlayer player) {
         super(new ContainerTable(table, player));
@@ -39,6 +40,7 @@ public class GuiTable extends GuiBase {
         }
 
         this.table = table;
+	    this.containerTable = (ContainerTable) this.inventorySlots;
     }
 
     @Override
@@ -177,9 +179,9 @@ public class GuiTable extends GuiBase {
 
         drawRect(POWER_X + POWER_INNER_OFFSET_X, POWER_Y + POWER_INNER_OFFSET_Y, POWER_INNER_SRC_X + POWER_INNER_WIDTH, POWER_INNER_SRC_Y, POWER_INNER_WIDTH, POWER_INNER_HEIGHT);
 
-        int height = POWER_INNER_HEIGHT * table.getPower() / table.maxPower;
+        int height = POWER_INNER_HEIGHT * containerTable.power / table.maxPower;
         int offset = POWER_INNER_HEIGHT - height;
-        GL11.glColor3f(ColorHelper.getRed(getTable().getPower(), getTable().maxPower), ColorHelper.getGreen(getTable().getPower(), getTable().maxPower), ColorHelper.getBlue(getTable().getPower(), getTable().maxPower));
+        GL11.glColor3f(ColorHelper.getRed(containerTable.power, getTable().maxPower), ColorHelper.getGreen(containerTable.power, getTable().maxPower), ColorHelper.getBlue(containerTable.power, getTable().maxPower));
             drawRect(POWER_X + POWER_INNER_OFFSET_X, POWER_Y + POWER_INNER_OFFSET_Y + offset, POWER_INNER_SRC_X, POWER_INNER_SRC_Y + offset, POWER_INNER_WIDTH, height);
             drawRect(POWER_X, POWER_Y + POWER_INNER_OFFSET_Y + offset - 1, POWER_SRC_X, POWER_SRC_Y - 1, POWER_WIDTH, 1);
             int srcX = POWER_SRC_X;
@@ -189,7 +191,7 @@ public class GuiTable extends GuiBase {
         GL11.glColor3f(1.0f,1.0f,1.0f);
 
         if (hover) {
-            String str = ColorHelper.getPowerColor(getTable().getPower(), getTable().maxPower) + "Power: " + FormattingHelper.formatNumber(table.getPower()) + " / " + FormattingHelper.formatNumber((int) table.maxPower);
+            String str = ColorHelper.getPowerColor(containerTable.power, getTable().maxPower) + "Power: " + FormattingHelper.formatNumber(containerTable.power) + " / " + FormattingHelper.formatNumber((int) table.maxPower);
             drawMouseOver(str);
         }
     }
