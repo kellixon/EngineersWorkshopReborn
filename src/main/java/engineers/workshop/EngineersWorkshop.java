@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import reborncore.common.network.RegisterPacketEvent;
 
-@Mod(modid = MODID, name = NAME)
+@Mod(modid = MODID, name = NAME, dependencies = "required-after:reborncore", certificateFingerprint = "8727a3141c8ec7f173b87aa78b9b9807867c4e6b")
 public class EngineersWorkshop {
 
 	@SidedProxy(clientSide = CLIENT_PROXY, serverSide = COMMON_PROXY)
