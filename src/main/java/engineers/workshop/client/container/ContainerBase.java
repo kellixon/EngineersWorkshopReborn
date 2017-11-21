@@ -75,10 +75,7 @@ public abstract class ContainerBase extends Container {
     public ItemStack transferStackInSlot(EntityPlayer player, int slotId) {
         return ItemStack.EMPTY;
     }
-
-    //TODO: Ewy, fix this!
-    //TODO: JORDAN FIX UR COMMENTING OUT SHIT. USE /* STUFF BETWEEN HERE */ U FUCKTARD!
-    
+	
     private static final int MOUSE_LEFT_CLICK = 0;
     private static final int MOUSE_RIGHT_CLICK = 1;
 
