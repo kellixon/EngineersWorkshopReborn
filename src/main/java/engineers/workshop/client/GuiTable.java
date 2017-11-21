@@ -189,7 +189,7 @@ public class GuiTable extends GuiBase {
         GL11.glColor3f(1.0f,1.0f,1.0f);
 
         if (hover) {
-            String str = ColorHelper.getPowerColor(containerTable.power, getTable().maxPower) + "Power: " + FormattingHelper.formatNumber(containerTable.power) + " / " + FormattingHelper.formatNumber((int) table.maxPower);
+            String str = ColorHelper.getPowerColor(containerTable.power, getTable().maxPower) + "Fuel: " + FormattingHelper.formatNumber(containerTable.power) + " / " + FormattingHelper.formatNumber((int) table.maxPower);
             drawMouseOver(str);
         }
     }
