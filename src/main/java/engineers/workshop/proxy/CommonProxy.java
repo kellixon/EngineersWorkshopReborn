@@ -5,6 +5,7 @@ import engineers.workshop.common.loaders.RecipeLoader;
 import engineers.workshop.common.network.PacketHandler;
 import engineers.workshop.client.GuiHandler;
 import engineers.workshop.common.loaders.ConfigLoader;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -33,5 +34,9 @@ public class CommonProxy {
 	}
 	
 	public void postInit(FMLPostInitializationEvent event){}
+
+	public EntityPlayer getPlayer(){
+		throw new RuntimeException("Not supported on the server");
+	}
 
 }

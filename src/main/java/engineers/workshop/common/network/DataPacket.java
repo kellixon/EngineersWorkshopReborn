@@ -1,5 +1,6 @@
 package engineers.workshop.common.network;
 
+import engineers.workshop.EngineersWorkshop;
 import engineers.workshop.client.container.ContainerTable;
 import engineers.workshop.common.network.data.DataType;
 import engineers.workshop.common.table.TileTable;
@@ -84,7 +85,7 @@ public class DataPacket implements INetworkPacket<DataPacket> {
 	@Override
 	public void processData(DataPacket message, MessageContext context) {
 		if (context.side == Side.CLIENT) {
-			onPacket(message, FMLClientHandler.instance().getClient().player, false);
+			onPacket(message, EngineersWorkshop.proxy.getPlayer(), false);
 		} else {
 			onPacket(message, context.getServerHandler().player, true);
 		}
