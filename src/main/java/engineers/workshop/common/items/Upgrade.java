@@ -25,8 +25,8 @@ public enum Upgrade {
     FILTER			(new MaxCount(1),			    ParentType.GLOBAL),						// Max count = 1
     TRANSFER		(new ConfigurableMax(6, 20),    ParentType.GLOBAL),						// Max count = 6  (Configable upto 20)
 	
-    AXE				(new MaxCount(1), 	    		ParentType.CRUSHING), 									// Max count = 1
-	COMPACTOR		(new MaxCount(1), 			    ParentType.CRAFTING, AUTO_CRAFTER); 	// Max count = 1
+    AXE				(new MaxCount(1), 	    		ParentType.CRUSHING); 									// Max count = 1
+	//COMPACTOR		(new MaxCount(1), 			    ParentType.CRAFTING, AUTO_CRAFTER); 	// Max count = 1
 
     /**
      * PATTERN("Pattern Crafting", "Remembers old recipes", 4, ParentType.CRAFTING),

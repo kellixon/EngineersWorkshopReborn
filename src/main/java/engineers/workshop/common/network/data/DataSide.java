@@ -119,12 +119,12 @@ public abstract class DataSide extends DataBase {
 	public static class FilterMode extends FilterBase {
 		@Override
 		public void save(TileTable table, NBTTagCompound dw, int id) {
-			dw.setInteger("id", getSetting(table, id).getMode().ordinal());
+			dw.setInteger("mode", getSetting(table, id).getMode().ordinal());
 		}
 
 		@Override
 		public void load(TileTable table, NBTTagCompound dr, int id) {
-			getSetting(table, id).setMode(TransferMode.values()[dr.getInteger("id")]);
+			getSetting(table, id).setMode(TransferMode.values()[dr.getInteger("mode")]);
 		}
 	}
 }

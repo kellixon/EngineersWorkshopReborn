@@ -245,7 +245,7 @@ public class UnitCraft extends Unit {
 
 
 	public void onUpgradeChange() {
-		if(table.getUpgradePage().getUpgradeCount(id, Upgrade.COMPACTOR) > 0 && table.getUpgradePage().getUpgradeCount(id, Upgrade.AUTO_CRAFTER) > 0){
+		if(table.getUpgradePage().getUpgradeCount(id, Upgrade.AXE) > 0 && table.getUpgradePage().getUpgradeCount(id, Upgrade.AUTO_CRAFTER) > 0){
 			for(int i = 0; i < 9; i++){
 				table.getSlots().get(i + gridId).setEnabled(false);
 			}
