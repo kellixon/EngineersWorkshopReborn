@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL11;
 import engineers.workshop.client.container.ContainerTable;
 import engineers.workshop.client.container.slot.SlotBase;
 import engineers.workshop.client.page.Page;
-import engineers.workshop.common.items.Upgrade;
 import engineers.workshop.common.network.PacketHandler;
 import engineers.workshop.common.network.PacketId;
 import engineers.workshop.common.network.data.DataType;
@@ -18,7 +17,6 @@ import engineers.workshop.common.util.helpers.ColorHelper;
 import engineers.workshop.common.util.helpers.FormattingHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextFormatting;
 
 public class GuiTable extends GuiBase {
 
@@ -202,7 +200,7 @@ public class GuiTable extends GuiBase {
     public void onGuiClosed() {
         super.onGuiClosed();
         if(!closed){
-        	PacketHandler.sendToServer(PacketHandler.getWriter(table, PacketId.CLOSE));
+        	PacketHandler.sendToServer(PacketHandler.getPacket(table, PacketId.CLOSE));
         	closed = true;
         }
     }
@@ -212,7 +210,7 @@ public class GuiTable extends GuiBase {
         super.setWorldAndResolution(minecraft, width, height);
         if (closed) {
         	closed = false;
-            PacketHandler.sendToServer(PacketHandler.getWriter(table, PacketId.RE_OPEN));
+            PacketHandler.sendToServer(PacketHandler.getPacket(table, PacketId.RE_OPEN));
         }
     }
 

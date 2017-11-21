@@ -6,7 +6,6 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cofh.redstoneflux.api.IEnergyReceiver;
 import engineers.workshop.client.container.slot.SlotBase;
 import engineers.workshop.client.container.slot.SlotFuel;
 import engineers.workshop.client.menu.GuiMenu;
@@ -22,13 +21,7 @@ import engineers.workshop.client.page.unit.Unit;
 import engineers.workshop.client.page.unit.UnitCraft;
 import engineers.workshop.common.items.Upgrade;
 import engineers.workshop.common.loaders.BlockLoader;
-import engineers.workshop.common.loaders.ConfigLoader;
-import engineers.workshop.common.network.DataReader;
-import engineers.workshop.common.network.DataWriter;
-import engineers.workshop.common.network.IBitCount;
-import engineers.workshop.common.network.LengthCount;
-import engineers.workshop.common.network.PacketHandler;
-import engineers.workshop.common.network.PacketId;
+import engineers.workshop.common.network.*;
 import engineers.workshop.common.network.data.DataType;
 import engineers.workshop.common.util.Logger;
 import net.minecraft.block.state.IBlockState;
@@ -221,18 +214,18 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	}
 
 	private void sendAllDataToPlayer(EntityPlayer player) {
-		DataWriter dw = PacketHandler.getWriter(this, PacketId.ALL);
+		DataPacket packet = PacketHandler.getPacket(this, PacketId.ALL);
 		for (DataType dataType : DataType.values()) {
-			if(dataType != null && this != null && dw != null)
-				dataType.save(this, dw, -1);
+			if(dataType != null && this != null && packet != null)
+				dataType.save(this, packet.createCompound(), -1);
 		}
-		PacketHandler.sendToPlayer(dw, player);
+		PacketHandler.sendToPlayer(packet, player);
 	}
 
 	private void sendDataToPlayer(DataType type, EntityPlayer player) {
-		DataWriter dw = PacketHandler.getWriter(this, PacketId.RENDER_UPDATE);
-		type.save(this, dw, -1);
-		PacketHandler.sendToPlayer(dw, player);
+		DataPacket packet = PacketHandler.getPacket(this, PacketId.RENDER_UPDATE);
+		type.save(this, packet.createCompound(), -1);
+		PacketHandler.sendToPlayer(packet, player);
 	}
 
 	public void sendDataToAllPlayers(DataType dataType, List<EntityPlayer> players) {
@@ -248,11 +241,11 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		sendToAllPlayersExcept(getWriterForType(dataType, id), ignored, players);
 	}
 
-	private void sendToAllPlayers(DataWriter dw, List<EntityPlayer> players) {
+	private void sendToAllPlayers(DataPacket dw, List<EntityPlayer> players) {
 		sendToAllPlayersExcept(dw, null, players);
 	}
 
-	private void sendToAllPlayersExcept(DataWriter dw, EntityPlayer ignored, List<EntityPlayer> players) {
+	private void sendToAllPlayersExcept(DataPacket dw, EntityPlayer ignored, List<EntityPlayer> players) {
 		players.stream().filter(player -> !player.equals(ignored))
 				.forEach(player -> PacketHandler.sendToPlayer(dw, player));
 	}
@@ -265,19 +258,18 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		PacketHandler.sendToServer(getWriterForType(dataType, id));
 	}
 
-	private DataWriter getWriterForType(DataType dataType, int id) {
-		DataWriter dw = PacketHandler.getWriter(this, PacketId.TYPE);
-		dw.writeEnum(dataType);
-		dataType.save(this, dw, id);
-
-		return dw;
+	private DataPacket getWriterForType(DataType dataType, int id) {
+		DataPacket packet = PacketHandler.getPacket(this, PacketId.TYPE);
+		packet.dataType = dataType;
+		dataType.save(this, packet.createCompound(), id);
+		return packet;
 	}
 
-	public void receiveServerPacket(DataReader dr, PacketId id, EntityPlayer player) {
+	public void receiveServerPacket(DataPacket dr, PacketId id, EntityPlayer player) {
 		switch (id) {
 		case TYPE:
-			DataType dataType = dr.readEnum(DataType.class);
-			int index = dataType.load(this, dr, false);
+			DataType dataType = dr.dataType;
+			int index = dataType.load(this, dr.compound, false);
 			if (index != -1 && dataType.shouldBounce(this)) {
 				sendDataToAllPlayersExcept(dataType, index, dataType.shouldBounceToAll(this) ? null : player, players);
 			}
@@ -293,7 +285,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 			addPlayer(player);
 			break;
 		case CLEAR:
-			clearGrid(player, dr.readData(GRID_ID_BITS));
+			clearGrid(player, dr.compound.getInteger("clear"));
 			break;
 		case ALL:
 			break;
@@ -305,17 +297,17 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		}
 	}
 
-	public void receiveClientPacket(DataReader dr, PacketId id) {
+	public void receiveClientPacket(DataPacket dr, PacketId id) {
 		switch (id) {
 		case ALL:
 			for (DataType dataType : DataType.values()) {
-				dataType.load(this, dr, true);
+				dataType.load(this, dr.compound, true);
 			}
 			onUpgradeChange();
 			break;
 		case TYPE:
-			DataType dataType = dr.readEnum(DataType.class);
-			dataType.load(this, dr, false);
+			DataType dataType = dr.dataType;
+			dataType.load(this, dr.compound, false);
 			if (dataType == DataType.SIDE_ENABLED) {
 				onSideChange();
 			}
@@ -539,7 +531,7 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 		if (!world.isRemote) {
 			onUpgradeChange();
 			world.notifyNeighborsOfStateChange(pos, BlockLoader.blockTable, true);
-			sendToAllPlayers(PacketHandler.getWriter(this, PacketId.UPGRADE_CHANGE), players);
+			sendToAllPlayers(PacketHandler.getPacket(this, PacketId.UPGRADE_CHANGE), players);
 		} else {
 			getUpgradePage().onUpgradeChange();
 		}
@@ -767,8 +759,8 @@ public class TileTable extends TileEntity implements IInventory, ISidedInventory
 	private static final IBitCount GRID_ID_BITS = new LengthCount(4);
 
 	public void clearGridSend(int id) {
-		DataWriter dw = PacketHandler.getWriter(this, PacketId.CLEAR);
-		dw.writeData(id, GRID_ID_BITS);
+		DataPacket dw = PacketHandler.getPacket(this, PacketId.CLEAR);
+		dw.createCompound().setInteger("clear", id);
 		PacketHandler.sendToServer(dw);
 	}
 
