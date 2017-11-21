@@ -7,11 +7,11 @@ public class DataPage extends DataBase {
 
 	@Override
 	public void save(TileTable table, NBTTagCompound dw, int id) {
-		dw.setInteger("id", table.getSelectedPage().getId());
+		dw.setInteger("page", table.getSelectedPage().getId());
 	}
 
 	@Override
 	public void load(TileTable table, NBTTagCompound dr, int id) {
-		table.setSelectedPage(table.getPages().get(dr.getInteger("id")));
+		table.setSelectedPage(table.getPages().get(dr.getInteger("page")));
 	}
 }

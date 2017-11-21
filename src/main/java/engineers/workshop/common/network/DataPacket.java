@@ -54,6 +54,8 @@ public class DataPacket implements INetworkPacket<DataPacket> {
 			buffer.writeBoolean(false);
 			buffer.writeInt(0);
 		}
+
+		buffer.writeInt(packetId.ordinal());
 	}
 
 	@Override
@@ -75,6 +77,8 @@ public class DataPacket implements INetworkPacket<DataPacket> {
 		} else {
 			buffer.readInt();
 		}
+
+		packetId = PacketId.values()[buffer.readInt()];
 	}
 
 	@Override
