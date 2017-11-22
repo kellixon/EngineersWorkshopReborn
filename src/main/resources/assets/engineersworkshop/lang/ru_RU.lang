@@ -3,21 +3,22 @@ tile.engineersworkshop:blockTable.name=Мастерской стол
 
 #Upgrade Names
 engineersworkshop:upgrade.blank.name=Чистое обновление
-engineersworkshop:upgrade.auto_crafter.name=Обновление: Автокрафтер
-engineersworkshop:upgrade.storage.name=Обновление: Хранение
-engineersworkshop:upgrade.charged.name=Обновление: Заряд
-engineersworkshop:upgrade.speed.name=Обновление: Скорость
-engineersworkshop:upgrade.queue.name=Обновление: Очерёдность
-engineersworkshop:upgrade.efficiency.name=Обновление: Эффективность
-engineersworkshop:upgrade.lava.name=Обновление: Энергия лавы
-engineersworkshop:upgrade.eu.name=Обновление: EU приёмщик
-engineersworkshop:upgrade.rf.name=Обновление: RF приёмщик
-engineersworkshop:upgrade.solar.name=Обновление: Солнечная энергия
-engineersworkshop:upgrade.auto_transfer.name=Обновление: Автопередача
-engineersworkshop:upgrade.filter.name=Обновление: Фильтр
-engineersworkshop:upgrade.transfer.name=Обновление: Ёмкость передачи
-engineersworkshop:upgrade.max_power.name=Обновление: Ёмкость энергии
-engineersworkshop:upgrade.fuel_delay.name=Обновление: Топливная горелка
+engineersworkshop:upgrade.auto_crafter.name=Обновление: "Автокрафтер"
+engineersworkshop:upgrade.storage.name=Обновление: "Хранение"
+engineersworkshop:upgrade.charged.name=Обновление: "Заряд"
+engineersworkshop:upgrade.speed.name=Обновление: "Скорость"
+engineersworkshop:upgrade.queue.name=Обновление: "Очерёдность"
+engineersworkshop:upgrade.efficiency.name=Обновление: "Эффективность"
+engineersworkshop:upgrade.lava.name=Обновление: "Энергия лавы"
+engineersworkshop:upgrade.eu.name=Обновление: "EU приёмщик"
+engineersworkshop:upgrade.rf.name=Обновление: "RF приёмщик"
+engineersworkshop:upgrade.solar.name=Обновление: "Солнечная энергия"
+engineersworkshop:upgrade.auto_transfer.name=Обновление: "Автопередача"
+engineersworkshop:upgrade.filter.name=Обновление: "Фильтр"
+engineersworkshop:upgrade.transfer.name=Обновление: "Ёмкость передачи"
+engineersworkshop:upgrade.max_power.name=Обновление: "Ёмкость энергии"
+engineersworkshop:upgrade.fuel_delay.name=Обновление: "Топливная горелка"
+engineersworkshop:upgrade.axe.name=Обновление: "Топор"
 
 #Upgrade Descriptions
 engineersworkshop:upgrade.blank.description=Компонент крафта
@@ -36,12 +37,16 @@ engineersworkshop:upgrade.filter.description=Включает фильтр пе�
 engineersworkshop:upgrade.transfer.description=Увеличивает ёмкость автопередачи
 engineersworkshop:upgrade.max_power.description=Увеличивает ёмкость макс. энергии
 engineersworkshop:upgrade.fuel_delay.description=Уменьшает время между потребляемой мощности
+engineersworkshop:upgrade.axe.description=Позволяет вашей дробилке нарезать бревна на доски
 
 #Upgrade Info
-engineersworkshop:upgrade.unstackable=Не суммируются очень хорошо
-engineersworkshop:upgrade.stackable=Суммируются до %s
+engineersworkshop:upgrade.unstackable=Не стакается
+engineersworkshop:upgrade.stackable=Стакается до %s
 
 #Creative Tabs
-itemGroup.engineersworkshop=Инженерная мастерская
+itemGroup.engineersworkshop=Engineer's Workshop
+
+#Shhhh....
+engineersworkshop:hbdark=Happy Birthday Darkosto!
 
 ###Translated to russian by Kellixon###
